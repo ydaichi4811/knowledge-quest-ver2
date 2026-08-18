@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GameScreen, PlayerData, GameMode, AvatarOption, PartnerType, PrivacySetting, QuestionProgressData } from './types';
+import { GameScreen, PlayerData, GameMode, AvatarOption, PartnerType, PrivacySetting, QuestionProgressData, QuestStage } from './types';
 import {
   loadPlayerData,
   savePlayerData,
@@ -45,6 +45,7 @@ export default function App() {
     regionId?: string;
     stageId: string;
     targetUnitId?: string;
+    stageInfo?: QuestStage;
   } | null>(null);
 
   const [showPartnerCareModal, setShowPartnerCareModal] = useState(false);
@@ -138,8 +139,8 @@ export default function App() {
     setPlayer(updated);
   };
 
-  const handleStartQuest = (regionId: string, stageId: string) => {
-    setActiveQuestStage({ regionId, stageId });
+  const handleStartQuest = (regionId: string, stageId: string, stageInfo?: QuestStage) => {
+    setActiveQuestStage({ regionId, stageId, stageInfo });
   };
 
   const handleStartSkillPractice = (skillId: string) => {
@@ -324,6 +325,7 @@ export default function App() {
         <MathBattleModal
           player={player}
           stageId={activeQuestStage.stageId}
+          stageInfo={activeQuestStage.stageInfo}
           targetUnitId={activeQuestStage.targetUnitId}
           onClose={() => setActiveQuestStage(null)}
           onPlayerUpdate={(updated) => {
