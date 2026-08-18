@@ -52,7 +52,12 @@ const ChromaKeyImage: React.FC<ChromaKeyImageProps> = ({
           const red = pixels[index];
           const green = pixels[index + 1];
           const blue = pixels[index + 2];
-          const isMagenta = red > 185 && blue > 155 && green < 135;
+          const isMagenta =
+            red > 170 &&
+            blue > 130 &&
+            green < 190 &&
+            red - green > 30 &&
+            blue - green > 20;
 
           if (isMagenta) {
             pixels[index + 3] = 0;
@@ -71,11 +76,13 @@ const ChromaKeyImage: React.FC<ChromaKeyImageProps> = ({
       context.putImageData(imageData, 0, 0);
       if (maxX < minX || maxY < minY) return;
 
-      const padding = 8;
-      const cropX = Math.max(0, minX - padding);
-      const cropY = Math.max(0, minY - padding);
-      const cropWidth = Math.min(canvas.width - cropX, maxX - minX + 1 + padding * 2);
-      const cropHeight = Math.min(canvas.height - cropY, maxY - minY + 1 + padding * 2);
+      const isLogo = src.includes('title-logo');
+      const cropX = isLogo ? 0 : Math.round(canvas.width * 0.02);
+      const cropY = Math.round(canvas.height * (isLogo ? 0.045 : 0.12));
+      const cropWidth = isLogo
+        ? canvas.width
+        : canvas.width - cropX * 2;
+      const cropHeight = Math.round(canvas.height * (isLogo ? 0.91 : 0.74));
       const cropped = document.createElement('canvas');
       cropped.width = cropWidth;
       cropped.height = cropHeight;
@@ -132,7 +139,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
         <ChromaKeyImage
           src={TITLE_LOGO}
           alt="Knowledge Quest ナレッジクエスト"
-          className="mt-[clamp(0rem,1vh,1rem)] h-auto w-[min(86vw,880px)] select-none object-contain drop-shadow-[0_8px_12px_rgba(15,23,42,0.28)] lg:w-[55%]"
+          className="mt-[clamp(0rem,1vh,1rem)] h-auto w-[min(76vw,720px)] select-none object-contain drop-shadow-[0_8px_12px_rgba(15,23,42,0.28)] lg:w-[46%]"
         />
 
         <div className="flex-1" />
@@ -142,7 +149,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
           onClick={handleStart}
           disabled={isStarting}
           aria-label="ゲームをスタート"
-          className="group mb-[clamp(0.5rem,3vh,2rem)] w-[min(72vw,480px)] cursor-pointer rounded-[999px] border-0 bg-transparent p-0 transition-transform duration-150 hover:scale-[1.035] active:scale-[0.97] disabled:cursor-wait disabled:opacity-80 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-blue-700 lg:w-[30%]"
+          className="group mb-[clamp(0.5rem,3vh,2rem)] w-[min(54vw,360px)] cursor-pointer rounded-[999px] border-0 bg-transparent p-0 transition-transform duration-150 hover:scale-[1.035] active:scale-[0.97] disabled:cursor-wait disabled:opacity-80 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-blue-700 lg:w-[24%]"
         >
           <ChromaKeyImage
             src={START_BUTTON}
