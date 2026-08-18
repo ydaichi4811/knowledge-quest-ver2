@@ -22,7 +22,7 @@ import { FuriganaText } from './FuriganaText';
 interface MapScreenProps {
   player: PlayerData;
   onBackToHome: () => void;
-  onStartQuest: (regionId: string, stageId: string) => void;
+  onStartQuest: (regionId: string, stageId: string, stageInfo?: QuestStage) => void;
   onOpenPretest?: () => void;
 }
 
@@ -34,8 +34,8 @@ const STAGE_EXTRA_INFO: Record<
   area_stage_1: {
     enemyName: '四角スライム',
     enemyIcon: '🟩',
-    questionCountText: '全 4 問',
-    timeEstimate: '約 3 分',
+    questionCountText: '全 5 問',
+    timeEstimate: '約 4 分',
   },
   area_stage_2: {
     enemyName: 'パラレルウッド',
@@ -626,7 +626,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                   onClick={() => {
                     const st = activeStageModal;
                     setActiveStageModal(null);
-                    onStartQuest(selectedRegion.id, st.id);
+                    onStartQuest(selectedRegion.id, st.id, st);
                   }}
                   className="btn-royal-gold w-full py-3.5 rounded-2xl text-base font-black flex items-center justify-center gap-2 shadow-[0_10px_20px_rgba(245,158,11,0.5)] border-2 border-amber-300 cursor-pointer hover:scale-102 transition-all"
                 >
