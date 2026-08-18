@@ -1216,7 +1216,7 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
                     <span>
                       {isFoundationReviewMode
                         ? '🌱 基礎復習バトル'
-                        : stageInfo?.title || 'ステージ 3-2 まよいの森'}
+                        : stageInfo?.title || '算数クエスト'}
                     </span>
                   </div>
 
