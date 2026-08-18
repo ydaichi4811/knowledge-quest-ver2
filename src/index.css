@@ -304,6 +304,19 @@ button {
   overflow: hidden;
 }
 
+
+/* The battle notebook uses dark text, so keep its paper surface bright. */
+.book-notebook-card {
+  background:
+    linear-gradient(rgba(180, 83, 9, 0.05) 1px, transparent 1px),
+    linear-gradient(160deg, #fffdf2 0%, #fff3c4 100%);
+  background-size: 100% 1.75rem, 100% 100%;
+  color: #0f172a;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.45),
+    inset 0 0 18px rgba(180, 83, 9, 0.12);
+}
+
 /* Spiral rings along left edge */
 .book-notebook-card::before {
   content: '笞ｪ笞ｪ笞ｪ笞ｪ笞ｪ';
