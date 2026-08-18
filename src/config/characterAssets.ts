@@ -8,6 +8,7 @@
 
 import heroBoyImage from '../assets/images/hero_boy_v1_1785625821391.jpg';
 import heroGirlImage from '../assets/images/hero_girl_v1_1785625837606.jpg';
+import buddyLarnyImage from '../assets/images/buddy_purple_dragon_v1_1785625850023.jpg';
 
 export interface CharacterAssetPath {
   image?: string;
@@ -53,39 +54,39 @@ export const HERO_ASSETS: Record<string, CharacterAssetPath> = {
 // Buddy Assets (Ver.1.0 Formal Purple Dragon "ラーニィ")
 export const BUDDY_ASSETS: Record<string, CharacterAssetPath> = {
   egg: {
-    image: '/assets/buddy/larny/idle.png',
+    image: buddyLarnyImage,
     fallbackText: '紫色のタマゴ (ラーニィ)',
   },
   baby: {
-    image: '/assets/buddy/larny/idle.png',
+    image: buddyLarnyImage,
     fallbackText: '赤ちゃんの紫ドラゴン (ラーニィ)',
   },
   child: {
-    image: '/assets/buddy/larny/idle.png',
+    image: buddyLarnyImage,
     fallbackText: '幼年期の紫ドラゴン (ラーニィ)',
   },
   grown: {
-    image: '/assets/buddy/larny/idle.png',
+    image: buddyLarnyImage,
     fallbackText: '成長期の紫ドラゴン (ラーニィ)',
   },
   final: {
-    image: '/assets/buddy/larny/idle.png',
+    image: buddyLarnyImage,
     fallbackText: '最終進化紫ドラゴン (ラーニィ)',
   },
   element_fire: {
-    image: '/assets/buddy/larny/idle.png',
+    image: buddyLarnyImage,
     fallbackText: '炎の紫ドラゴン (ラーニィ)',
   },
   element_ice: {
-    image: '/assets/buddy/larny/idle.png',
+    image: buddyLarnyImage,
     fallbackText: '氷の紫ドラゴン (ラーニィ)',
   },
   element_ghost: {
-    image: '/assets/buddy/larny/idle.png',
+    image: buddyLarnyImage,
     fallbackText: 'ゴースト紫ドラゴン (ラーニィ)',
   },
   element_holy: {
-    image: '/assets/buddy/larny/idle.png',
+    image: buddyLarnyImage,
     fallbackText: '聖紫ドラゴン (ラーニィ)',
   },
 };
