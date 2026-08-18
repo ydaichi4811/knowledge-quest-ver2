@@ -56,7 +56,10 @@ const ChromaKeyImage: React.FC<ChromaKeyImageProps> = ({
 
           if (isMagenta) {
             pixels[index + 3] = 0;
-          } else if (pixels[index + 3] > 0) {
+          } else {
+            // The source PNGs contain valid RGB artwork but damaged alpha data.
+            // Restore all non-key pixels to full opacity before calculating bounds.
+            pixels[index + 3] = 255;
             minX = Math.min(minX, x);
             minY = Math.min(minY, y);
             maxX = Math.max(maxX, x);
