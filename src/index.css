@@ -1,6 +1,6 @@
-@import "tailwindcss";
-
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Cinzel:wght@700;900&display=swap');
+
+@import "tailwindcss";
 
 :root {
   font-family: 'M PLUS Rounded 1c', sans-serif;
@@ -66,7 +66,7 @@ button {
 }
 
 /* ==========================================================================
-   OFFICIAL VER 3.0: PATTERN 3 "BOOK & NOTEBOOK" (ブック＆ノート) DESIGN SYSTEM
+   OFFICIAL VER 3.0: PATTERN 3 "BOOK & NOTEBOOK" (繝悶ャ繧ｯ・・ヮ繝ｼ繝・ DESIGN SYSTEM
    ========================================================================== */
 
 /* --- 1. BUTTONS (6 Colors with Book-Stitch & Leather Binding Texture) --- */
@@ -97,7 +97,7 @@ button {
   box-shadow: 0 1px 0 rgba(0,0,0,0.35);
 }
 
-/* 青: 通常 (Normal / General Action) */
+/* 髱・ 騾壼ｸｸ (Normal / General Action) */
 .btn-book-blue {
   background: linear-gradient(180deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
   border: 2px solid #93c5fd;
@@ -113,7 +113,7 @@ button {
   border-left: 2px dashed rgba(255,255,255,0.5);
 }
 
-/* 黄色: 決定 (Confirm / Primary Action) */
+/* 鮟・牡: 豎ｺ螳・(Confirm / Primary Action) */
 .btn-book-yellow {
   background: linear-gradient(180deg, #facc15 0%, #eab308 50%, #ca8a04 100%);
   border: 2px solid #fef08a;
@@ -130,7 +130,7 @@ button {
   border-left: 2px dashed rgba(120,53,15,0.4);
 }
 
-/* オレンジ: ミッション (Mission / Special Action) */
+/* 繧ｪ繝ｬ繝ｳ繧ｸ: 繝溘ャ繧ｷ繝ｧ繝ｳ (Mission / Special Action) */
 .btn-book-orange {
   background: linear-gradient(180deg, #fb923c 0%, #f97316 50%, #ea580c 100%);
   border: 2px solid #ffedd5;
@@ -146,7 +146,7 @@ button {
   border-left: 2px dashed rgba(255,255,255,0.5);
 }
 
-/* 緑: 完了 (Complete / Success Action) */
+/* 邱・ 螳御ｺ・(Complete / Success Action) */
 .btn-book-green {
   background: linear-gradient(180deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
   border: 2px solid #bbf7d0;
@@ -162,7 +162,7 @@ button {
   border-left: 2px dashed rgba(255,255,255,0.5);
 }
 
-/* 茶色: 戻る (Back / Secondary Action) */
+/* 闌ｶ濶ｲ: 謌ｻ繧・(Back / Secondary Action) */
 .btn-book-brown {
   background: linear-gradient(180deg, #a16207 0%, #854d0e 50%, #713f12 100%);
   border: 2px solid #fde047;
@@ -178,7 +178,7 @@ button {
   border-left: 2px dashed rgba(254,240,138,0.5);
 }
 
-/* 赤: キャンセル (Cancel / Danger Action) */
+/* 襍､: 繧ｭ繝｣繝ｳ繧ｻ繝ｫ (Cancel / Danger Action) */
 .btn-book-red {
   background: linear-gradient(180deg, #f87171 0%, #ef4444 50%, #dc2626 100%);
   border: 2px solid #fecaca;
@@ -306,7 +306,7 @@ button {
 
 /* Spiral rings along left edge */
 .book-notebook-card::before {
-  content: '⚪⚪⚪⚪⚪';
+  content: '笞ｪ笞ｪ笞ｪ笞ｪ笞ｪ';
   position: absolute;
   left: -6px;
   top: 15%;
