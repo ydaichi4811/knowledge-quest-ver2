@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { PlayerData, LearningQuestion, QuestStage, ReviewSessionData } from '../types';
 import { ALL_LEARNING_QUESTIONS, getQuestionsBySkill, getPrerequisiteQuestions } from '../data/questionsData';
+import { REGIONS_DATA } from '../data/regions';
 import { getSkillById } from '../data/skillsData';
 import { addExpAndPoints, savePlayerData } from '../services/gameStorage';
 import { processQuestionAnswer, ProcessAnswerResult } from '../services/rewardService';
@@ -409,6 +410,9 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
   onReturnToHome,
 }) => {
   console.log(`⑨/⑩ [MathBattleModal Render] player.name=${player.name}, current EXP=${player.exp}, current KQ=${player.points}`);
+  const resolvedStageInfo = stageInfo || REGIONS_DATA
+    .flatMap((region) => region.stages)
+    .find((stage) => stage.id === stageId);
   // Select main questions matching targetSkillId, targetUnitId, or stageId
   const mainQuestions = ALL_LEARNING_QUESTIONS.filter((q) => {
     if (targetSkillId) return q.skillId === targetSkillId;
@@ -1046,7 +1050,7 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
       rank,
       isFirstClear,
       isPerfectClear,
-      stageInfo,
+      stageInfo: resolvedStageInfo,
     });
 
     // レベルアップ & 経験値加算 (経験値計算場所)
@@ -1216,7 +1220,7 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
                     <span>
                       {isFoundationReviewMode
                         ? '🌱 基礎復習バトル'
-                        : stageInfo?.title || '算数クエスト'}
+                        : resolvedStageInfo?.title || '算数クエスト'}
                     </span>
                   </div>
 
