@@ -47,9 +47,17 @@ import {
 } from 'lucide-react';
 
 function QuestionDiagram({ question }: { question: LearningQuestion }) {
-  const isAreaRectangle = question.questionText.includes('長方形') || question.unitId?.includes('rectangle') || question.unitId?.includes('area');
   const isTriangle = question.questionText.includes('三角形') || question.unitId?.includes('triangle');
   const isParallel = question.questionText.includes('平行四辺形') || question.unitId?.includes('parallel');
+  const isSquare = question.questionText.includes('正方形') || question.unitId?.includes('square');
+  const isAreaRectangle = !isTriangle && !isParallel && (
+    question.questionText.includes('長方形') ||
+    question.unitId?.includes('rectangle') ||
+    isSquare
+  );
+  const dimensions = [...question.questionText.matchAll(/(\\d+)\\s*cm/g)].map((match) => match[1]);
+  const firstDimension = dimensions[0] || '?';
+  const secondDimension = isSquare ? firstDimension : (dimensions[1] || '?');
 
   if (isAreaRectangle) {
     return (
@@ -57,11 +65,11 @@ function QuestionDiagram({ question }: { question: LearningQuestion }) {
         <div className="relative w-44 sm:w-56 h-24 sm:h-28 border-2 border-slate-700 bg-amber-100/70 rounded flex items-center justify-center shadow-sm">
           {/* Top dimension label */}
           <span className="absolute -top-6 text-xs sm:text-sm font-black text-slate-900 font-mono bg-amber-200/90 px-2 py-0.5 rounded border border-amber-400">
-            8cm
+            {firstDimension}cm
           </span>
           {/* Right dimension label */}
           <span className="absolute -right-10 text-xs sm:text-sm font-black text-slate-900 font-mono bg-amber-200/90 px-2 py-0.5 rounded border border-amber-400">
-            5cm
+            {secondDimension}cm
           </span>
           <span className="text-xs text-slate-600 font-extrabold">面積 = ? ㎠</span>
         </div>
@@ -75,8 +83,8 @@ function QuestionDiagram({ question }: { question: LearningQuestion }) {
         <svg className="w-48 h-24" viewBox="0 0 100 70">
           <polygon points="10,60 90,60 50,10" fill="#fde68a" stroke="#334155" strokeWidth="2.5" />
           <line x1="50" y1="10" x2="50" y2="60" stroke="#dc2626" strokeWidth="2" strokeDasharray="3 3" />
-          <text x="50" y="68" fontSize="8" textAnchor="middle" fontWeight="bold" fill="#1e293b">底辺 10cm</text>
-          <text x="54" y="38" fontSize="8" fontWeight="bold" fill="#dc2626">高さ 6cm</text>
+          <text x="50" y="68" fontSize="8" textAnchor="middle" fontWeight="bold" fill="#1e293b">底辺 {firstDimension}cm</text>
+          <text x="54" y="38" fontSize="8" fontWeight="bold" fill="#dc2626">高さ {secondDimension}cm</text>
         </svg>
       </div>
     );
@@ -88,8 +96,8 @@ function QuestionDiagram({ question }: { question: LearningQuestion }) {
         <svg className="w-48 h-24" viewBox="0 0 110 70">
           <polygon points="25,15 100,15 75,60 0,60" fill="#fde68a" stroke="#334155" strokeWidth="2.5" />
           <line x1="25" y1="15" x2="25" y2="60" stroke="#dc2626" strokeWidth="2" strokeDasharray="3 3" />
-          <text x="38" y="68" fontSize="8" textAnchor="middle" fontWeight="bold" fill="#1e293b">底辺 12cm</text>
-          <text x="30" y="38" fontSize="8" fontWeight="bold" fill="#dc2626">高さ 5cm</text>
+          <text x="38" y="68" fontSize="8" textAnchor="middle" fontWeight="bold" fill="#1e293b">底辺 {firstDimension}cm</text>
+          <text x="30" y="38" fontSize="8" fontWeight="bold" fill="#dc2626">高さ {secondDimension}cm</text>
         </svg>
       </div>
     );
