@@ -97,9 +97,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#071328] text-[#2c1d11] p-2 sm:p-4 flex flex-col items-center justify-center font-sans relative overflow-x-hidden">
+    <div className="w-full min-h-screen bg-transparent text-[#2c1d11] p-2 sm:p-4 flex flex-col items-center justify-center font-sans relative overflow-x-hidden">
       {/* Background Glow */}
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#112a52] via-[#071328] to-[#030914] pointer-events-none" />
+      <div className="fixed inset-0 bg-slate-950/20 pointer-events-none" />
 
       {/* Main Container - Formal Design Master Outer Frame */}
       <div className="w-full max-w-[1420px] bg-[#0b1b36] border-4 border-[#b89548] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.9)] flex flex-col lg:flex-row relative z-10 overflow-hidden my-auto">
@@ -822,3 +822,4 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     </div>
   );
 };
+

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { PlayerData } from '../types';
 
 interface TitleScreenProps {
@@ -8,100 +8,9 @@ interface TitleScreenProps {
   onOpenResetModal: () => void;
 }
 
-// Keep the URL ASCII-only so AI Studio does not corrupt the Japanese asset path.
-const TITLE_BACKGROUND =
-  '/assets/title/%E9%9D%92%E7%A9%BA%E3%81%AB%E6%98%A0%E3%81%88%E3%82%8B%E4%B8%98%E3%81%AE%E3%83%95%E3%82%A1%E3%83%B3%E3%82%BF%E3%82%B8%E3%83%BC%E5%9F%8E%E4%B8%8B%E7%94%BA.png';
-const TITLE_LOGO = '/assets/title/KQ_title-logo_transparent_v01.png';
-const START_BUTTON = '/assets/title/KQ_title-start-button_transparent_v01.png';
-
-interface ChromaKeyImageProps {
-  src: string;
-  alt: string;
-  className: string;
-}
-
-const ChromaKeyImage: React.FC<ChromaKeyImageProps> = ({
-  src,
-  alt,
-  className,
-}) => {
-  const [processedSrc, setProcessedSrc] = useState<string>();
-
-  useEffect(() => {
-    let active = true;
-    const source = new Image();
-
-    source.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = source.naturalWidth;
-      canvas.height = source.naturalHeight;
-      const context = canvas.getContext('2d', { willReadFrequently: true });
-      if (!context) return;
-
-      context.drawImage(source, 0, 0);
-      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-      const pixels = imageData.data;
-      let minX = canvas.width;
-      let minY = canvas.height;
-      let maxX = -1;
-      let maxY = -1;
-
-      for (let y = 0; y < canvas.height; y += 1) {
-        for (let x = 0; x < canvas.width; x += 1) {
-          const index = (y * canvas.width + x) * 4;
-          const red = pixels[index];
-          const green = pixels[index + 1];
-          const blue = pixels[index + 2];
-          const isMagenta =
-            red > 170 &&
-            blue > 130 &&
-            green < 190 &&
-            red - green > 30 &&
-            blue - green > 20;
-
-          if (isMagenta) {
-            pixels[index + 3] = 0;
-          } else {
-            // The source PNGs contain valid RGB artwork but damaged alpha data.
-            // Restore all non-key pixels to full opacity before calculating bounds.
-            pixels[index + 3] = 255;
-            minX = Math.min(minX, x);
-            minY = Math.min(minY, y);
-            maxX = Math.max(maxX, x);
-            maxY = Math.max(maxY, y);
-          }
-        }
-      }
-
-      context.putImageData(imageData, 0, 0);
-      if (maxX < minX || maxY < minY) return;
-
-      const isLogo = src.includes('title-logo');
-      const cropX = isLogo ? 0 : Math.round(canvas.width * 0.02);
-      const cropY = Math.round(canvas.height * (isLogo ? 0.045 : 0.12));
-      const cropWidth = isLogo
-        ? canvas.width
-        : canvas.width - cropX * 2;
-      const cropHeight = Math.round(canvas.height * (isLogo ? 0.91 : 0.74));
-      const cropped = document.createElement('canvas');
-      cropped.width = cropWidth;
-      cropped.height = cropHeight;
-      cropped
-        .getContext('2d')
-        ?.drawImage(canvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-
-      if (active) setProcessedSrc(cropped.toDataURL('image/png'));
-    };
-
-    source.src = src;
-    return () => {
-      active = false;
-    };
-  }, [src]);
-
-  if (!processedSrc) return null;
-  return <img src={processedSrc} alt={alt} className={className} draggable={false} />;
-};
+const BACKGROUND = '/assets/title/app-background.png';
+const LOGO = '/assets/title/title-logo-final.png';
+const START_BUTTON = '/assets/title/title-start-final.png';
 
 export const TitleScreen: React.FC<TitleScreenProps> = ({
   saveData,
@@ -113,48 +22,44 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
   const handleStart = () => {
     if (isStarting) return;
     setIsStarting(true);
-
-    if (saveData) {
-      onContinue();
-      return;
-    }
-    onStartNew();
+    if (saveData) onContinue();
+    else onStartNew();
   };
 
   return (
     <main
-      className="relative min-h-[100svh] w-full overflow-hidden bg-sky-200"
+      className="relative isolate min-h-[100svh] w-full overflow-hidden"
       aria-label="Knowledge Quest タイトル画面"
     >
       <img
-        src={TITLE_BACKGROUND}
-        alt="青空の下に広がるマスリア王国の城下町"
-        className="absolute inset-0 h-full w-full object-cover object-center"
+        src={BACKGROUND}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
         draggable={false}
       />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white/5 via-transparent to-slate-950/25" />
 
-      <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-slate-950/10" />
-
-      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1600px] flex-col items-center px-4 py-[clamp(1rem,3vh,2.5rem)] sm:px-8">
-        <ChromaKeyImage
-          src={TITLE_LOGO}
+      <div className="mx-auto flex min-h-[100svh] w-full max-w-[1500px] flex-col items-center justify-between px-4 py-[clamp(1rem,4vh,3rem)] sm:px-8">
+        <img
+          src={LOGO}
           alt="Knowledge Quest ナレッジクエスト"
-          className="mt-[clamp(0rem,1vh,1rem)] h-auto w-[min(76vw,720px)] select-none object-contain drop-shadow-[0_8px_12px_rgba(15,23,42,0.28)] lg:w-[46%]"
+          className="h-auto max-h-[48svh] w-[min(88vw,820px)] object-contain drop-shadow-[0_10px_14px_rgba(15,23,42,0.35)]"
+          draggable={false}
         />
-
-        <div className="flex-1" />
 
         <button
           type="button"
           onClick={handleStart}
           disabled={isStarting}
           aria-label="ゲームをスタート"
-          className="group mb-[clamp(0.5rem,3vh,2rem)] w-[min(54vw,360px)] cursor-pointer rounded-[999px] border-0 bg-transparent p-0 transition-transform duration-150 hover:scale-[1.035] active:scale-[0.97] disabled:cursor-wait disabled:opacity-80 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-blue-700 lg:w-[24%]"
+          className="mb-[clamp(0rem,2vh,1.5rem)] w-[min(62vw,410px)] cursor-pointer border-0 bg-transparent p-0 transition-transform duration-150 hover:scale-[1.04] active:scale-[0.97] disabled:cursor-wait disabled:opacity-75 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/90"
         >
-          <ChromaKeyImage
+          <img
             src={START_BUTTON}
             alt="スタート"
-            className="h-auto w-full select-none object-contain drop-shadow-[0_9px_10px_rgba(15,23,42,0.35)]"
+            className="h-auto w-full object-contain drop-shadow-[0_10px_12px_rgba(15,23,42,0.4)]"
+            draggable={false}
           />
         </button>
       </div>
