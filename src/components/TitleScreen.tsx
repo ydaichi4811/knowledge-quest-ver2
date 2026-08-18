@@ -11,8 +11,8 @@ interface TitleScreenProps {
 // Keep the URL ASCII-only so AI Studio does not corrupt the Japanese asset path.
 const TITLE_BACKGROUND =
   '/assets/title/%E9%9D%92%E7%A9%BA%E3%81%AB%E6%98%A0%E3%81%88%E3%82%8B%E4%B8%98%E3%81%AE%E3%83%95%E3%82%A1%E3%83%B3%E3%82%BF%E3%82%B8%E3%83%BC%E5%9F%8E%E4%B8%8B%E7%94%BA.png';
-const TITLE_LOGO = '/assets/title/KQ_title-logo_transparent_v01.png';
-const START_BUTTON = '/assets/title/KQ_title-start-button_transparent_v01.png';
+const TITLE_LOGO = '/assets/title/KQ_title-logo-transparent-v02.png';
+const START_BUTTON = '/assets/title/KQ_title-start-button-transparent-v02.png';
 
 export const TitleScreen: React.FC<TitleScreenProps> = ({
   saveData,
