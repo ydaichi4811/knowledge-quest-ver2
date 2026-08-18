@@ -1,0 +1,6 @@
+{
+  "name": "Knowledge Quest",
+  "description": "小学5年生向け算数学習RPG・育成ゲームアプリ（マスリア王国）",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
