@@ -6,6 +6,9 @@
  * All paths are static relative string paths under /assets/
  */
 
+import heroBoyImage from '../assets/images/hero_boy_v1_1785625821391.jpg';
+import heroGirlImage from '../assets/images/hero_girl_v1_1785625837606.jpg';
+
 export interface CharacterAssetPath {
   image?: string;
   fallbackText?: string;
@@ -14,35 +17,35 @@ export interface CharacterAssetPath {
 // Hero Assets (Ver.1.0 Formal Protagonist Design - Boy & Girl)
 export const HERO_ASSETS: Record<string, CharacterAssetPath> = {
   boy_idle: {
-    image: '/assets/hero/boy/idle.png',
+    image: heroBoyImage,
     fallbackText: '【正式主人公Ver.1.0】男女の子 (青冒険服・剣)',
   },
   boy_attack: {
-    image: '/assets/hero/boy/attack.png',
+    image: heroBoyImage,
     fallbackText: '【正式主人公Ver.1.0】男の子・攻撃',
   },
   boy_damage: {
-    image: '/assets/hero/boy/damage.png',
+    image: heroBoyImage,
     fallbackText: '【正式主人公Ver.1.0】男の子・ダメージ',
   },
   boy_victory: {
-    image: '/assets/hero/boy/victory.png',
+    image: heroBoyImage,
     fallbackText: '【正式主人公Ver.1.0】男の子・勝利',
   },
   girl_idle: {
-    image: '/assets/hero/girl/idle.png',
+    image: heroGirlImage,
     fallbackText: '【正式主人公Ver.1.0】女の子 (ピンク冒険服・杖)',
   },
   girl_attack: {
-    image: '/assets/hero/girl/attack.png',
+    image: heroGirlImage,
     fallbackText: '【正式主人公Ver.1.0】女の子・攻撃',
   },
   girl_damage: {
-    image: '/assets/hero/girl/damage.png',
+    image: heroGirlImage,
     fallbackText: '【正式主人公Ver.1.0】女の子・ダメージ',
   },
   girl_victory: {
-    image: '/assets/hero/girl/victory.png',
+    image: heroGirlImage,
     fallbackText: '【正式主人公Ver.1.0】女の子・勝利',
   },
 };
