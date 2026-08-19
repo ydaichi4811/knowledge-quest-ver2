@@ -112,7 +112,7 @@ for (const target of targets) {
   await page.screenshot({ path: `${outputDir}/${target.name}-05-companion-room.png`, fullPage: true });
   await assertNoHorizontalOverflow('companion-room');
 
-  await page.getByRole('button').filter({ hasText: 'ホーム' }).last().click();
+  await page.getByRole('button', { name: '相棒の部屋を閉じる' }).click();
   await page.getByText('冒険の進め方').waitFor();
   await page.getByRole('button', { name: /問題に挑戦する/ }).click();
   await page.getByText('マスリア王国 冒険マップ').waitFor();
