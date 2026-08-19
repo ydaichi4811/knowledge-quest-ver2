@@ -13,6 +13,8 @@ const targets = [
 const browser = await chromium.launch();
 const failures = [];
 
+const optionCircles = ['①', '②', '③', '④'];
+
 for (const target of targets) {
   const context = await browser.newContext({
     viewport: target.viewport,
@@ -36,6 +38,49 @@ for (const target of targets) {
     }
   };
 
+  const closeDailyMissionIfPresent = async () => {
+    const closeButton = page.getByRole('button', { name: '閉じる' }).first();
+    const appeared = await closeButton
+      .waitFor({ state: 'visible', timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    if (appeared) {
+      await closeButton.click();
+      await closeButton.waitFor({ state: 'hidden' });
+    }
+  };
+
+  const dismissBattleTutorialIfPresent = async () => {
+    const tutorialButton = page.getByRole('button', { name: /わかった/ });
+    const appeared = await tutorialButton
+      .waitFor({ state: 'visible', timeout: 1200 })
+      .then(() => true)
+      .catch(() => false);
+    if (appeared) await tutorialButton.click();
+  };
+
+  const chooseOption = async (circle) => {
+    await page.getByText(circle, { exact: true }).last().click();
+  };
+
+  const answerCurrentQuestionCorrectly = async () => {
+    await chooseOption(optionCircles[0]);
+    await page.getByRole('button', { name: 'けってい（答える）' }).click();
+    await page.getByRole('button', { name: /つぎの問題へ/ }).waitFor();
+    await dismissBattleTutorialIfPresent();
+
+    const retryButton = page.getByRole('button', { name: /再挑戦/ });
+    if (await retryButton.isVisible()) {
+      const correctOption = page.locator('button.ring-2.ring-emerald-500').first();
+      const correctCircle = (await correctOption.locator('span').first().innerText()).trim();
+      await retryButton.click();
+      await chooseOption(correctCircle);
+      await page.getByRole('button', { name: 'けってい（答える）' }).click();
+      await page.getByRole('button', { name: /つぎの問題へ/ }).waitFor();
+      await dismissBattleTutorialIfPresent();
+    }
+  };
+
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
   await page.getByText('Knowledge Quest', { exact: true }).waitFor();
   await page.screenshot({ path: `${outputDir}/${target.name}-01-title.png`, fullPage: true });
@@ -47,9 +92,8 @@ for (const target of targets) {
   await assertNoHorizontalOverflow('registration');
   await page.getByRole('button', { name: /この設定でマスリア王国へ旅立つ/ }).click();
 
-  const closeDaily = page.getByRole('button', { name: '閉じる' }).first();
-  if (await closeDaily.isVisible({ timeout: 3000 }).catch(() => false)) await closeDaily.click();
   await page.getByText('冒険の進め方').waitFor();
+  await closeDailyMissionIfPresent();
   await page.screenshot({ path: `${outputDir}/${target.name}-03-home.png`, fullPage: true });
   await assertNoHorizontalOverflow('home');
 
@@ -67,6 +111,40 @@ for (const target of targets) {
   await page.getByText(/相棒の部屋/).first().waitFor();
   await page.screenshot({ path: `${outputDir}/${target.name}-05-companion-room.png`, fullPage: true });
   await assertNoHorizontalOverflow('companion-room');
+
+  await page.getByRole('button').filter({ hasText: 'ホーム' }).last().click();
+  await page.getByText('冒険の進め方').waitFor();
+  await page.getByRole('button', { name: /問題に挑戦する/ }).click();
+  await page.getByText('マスリア王国 冒険マップ').waitFor();
+  await page.getByText('はじまりの草原', { exact: true }).click();
+  await page.getByRole('button', { name: /このクエストに挑戦する/ }).click();
+  const questionHeader = page.getByText(/問題\s+\d+\s*\/\s*\d+/).first();
+  await questionHeader.waitFor();
+  await page.screenshot({ path: `${outputDir}/${target.name}-06-battle.png`, fullPage: true });
+  await assertNoHorizontalOverflow('battle');
+
+  const questionHeaderText = await questionHeader.innerText();
+  const totalQuestions = Number(questionHeaderText.match(/\/\s*(\d+)/)?.[1] || 0);
+  if (!totalQuestions) throw new Error(`${target.name}: could not determine battle question count`);
+
+  for (let questionIndex = 0; questionIndex < totalQuestions; questionIndex += 1) {
+    await answerCurrentQuestionCorrectly();
+    await page.getByRole('button', { name: /つぎの問題へ/ }).click();
+  }
+
+  await page.getByText(/QUEST CLEAR!|CHALLENGE FINISHED/).waitFor();
+  const npcClose = page.getByRole('button', { name: '閉じる' }).first();
+  if (await npcClose.isVisible()) await npcClose.click();
+  await page.screenshot({ path: `${outputDir}/${target.name}-07-result.png`, fullPage: true });
+  await assertNoHorizontalOverflow('result');
+
+  await page.getByRole('button', { name: /ホームへ戻る/ }).click();
+  await page.getByText('冒険の進め方').waitFor();
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.getByText('冒険の進め方').waitFor();
+  await page.getByText(`テスト${target.name === 'mobile' ? 'M' : 'D'}`, { exact: true }).first().waitFor();
+  await page.screenshot({ path: `${outputDir}/${target.name}-08-persisted-home.png`, fullPage: true });
+  await assertNoHorizontalOverflow('persisted-home');
 
   if (pageErrors.length) failures.push(`${target.name}: browser errors: ${pageErrors.join(' | ')}`);
   await context.close();
