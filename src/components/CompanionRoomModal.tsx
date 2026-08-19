@@ -120,6 +120,7 @@ export const CompanionRoomModal: React.FC<CompanionRoomModalProps> = ({
       >
         <button
           onClick={onClose}
+          aria-label="相棒の部屋を閉じる"
           className="absolute top-4 right-4 text-slate-400 hover:text-rose-400 p-1 rounded-lg hover:bg-slate-800 transition-all cursor-pointer z-20"
         >
           <X className="w-5 h-5" />
