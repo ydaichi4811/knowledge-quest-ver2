@@ -5,6 +5,7 @@ import { PlayerData, CompanionExpression } from '../types';
 import { BuddyCharacter } from './BuddyCharacter';
 import { careCompanion, setCompanionNameAndHatch } from '../services/companionService';
 import { savePlayerData } from '../services/gameStorage';
+import { updateDailyMissionProgress } from '../services/dailyMissionService';
 import { ROOM_THEMES } from '../services/itemAndRoomService';
 import { CompanionGrowthRecordModal } from './CompanionGrowthRecordModal';
 import { CompanionProfileCard } from './CompanionProfileCard';
@@ -63,8 +64,18 @@ export const CompanionRoomModal: React.FC<CompanionRoomModalProps> = ({
   ) => {
     const careRes = careCompanion(player, actionType);
 
-    savePlayerData(careRes.updatedPlayer);
-    onPlayerUpdate(careRes.updatedPlayer);
+    let updatedPlayer = careRes.updatedPlayer;
+    if (careRes.rewardClaimed) {
+      if (actionType === 'talk' || actionType === 'talk_egg') {
+        updatedPlayer = updateDailyMissionProgress(updatedPlayer, 'talk_companion_1', 1);
+      }
+      if (actionType === 'play' || actionType === 'pet' || actionType === 'polish') {
+        updatedPlayer = updateDailyMissionProgress(updatedPlayer, 'play_companion_1', 1);
+      }
+    }
+
+    savePlayerData(updatedPlayer);
+    onPlayerUpdate(updatedPlayer);
 
     setStatusMessage(careRes.message);
     setExpression(careRes.reactionExpression);

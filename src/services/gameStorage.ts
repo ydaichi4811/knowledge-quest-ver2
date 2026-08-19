@@ -158,7 +158,19 @@ function sanitizePlayerData(data: any): PlayerData {
     partner: data.partner || PARTNER_DEFAULTS.fox,
     companion: data.companion,
     companionSettings: data.companionSettings,
+    battleSettings: data.battleSettings,
+    stageProgress: data.stageProgress || {},
+    unlockedCards: data.unlockedCards || [],
     foodItemsCount: data.foodItemsCount,
+    inventory: data.inventory || {},
+    gachaCollection: data.gachaCollection || {},
+    itemUsageHistory: data.itemUsageHistory || [],
+    companionRoom: data.companionRoom,
+    dailyMissions: data.dailyMissions,
+    companionEncyclopedia: data.companionEncyclopedia,
+    claimedRewardIds: data.claimedRewardIds || [],
+    lastDailyMissionDate: data.lastDailyMissionDate,
+    hasSeenDailyPopupToday: data.hasSeenDailyPopupToday,
     unlockedRegions: data.unlockedRegions || ['area'],
     completedQuests: data.completedQuests || [],
     totalAnswered: data.totalAnswered || 0,
@@ -318,8 +330,14 @@ export function createInitialPlayer(
     updatedAt: new Date().toISOString(),
   };
 
-  savePlayerData(newPlayer);
-  return newPlayer;
+  // A brand-new profile must contain the same complete schema as a loaded one.
+  // Otherwise the first visit to inventory, missions, or the companion room
+  // appears empty until the page is reloaded.
+  const initializedPlayer = ensureStageProgress(
+    ensureDailyMissions(ensureItemAndRoomData(newPlayer))
+  );
+  savePlayerData(initializedPlayer);
+  return initializedPlayer;
 }
 
 /**
@@ -463,3 +481,4 @@ export function addExpAndPoints(
     expResult,
   };
 }
+

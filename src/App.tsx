@@ -275,6 +275,7 @@ export default function App() {
                   <GachaScreenView
                     player={player}
                     onPlayerUpdate={(updated) => setPlayer(updated)}
+                    onOpenCompanionRoom={() => setShowCompanionRoomModal(true)}
                   />
                 )}
 
@@ -405,3 +406,4 @@ export default function App() {
     </FuriganaProvider>
   );
 }
+

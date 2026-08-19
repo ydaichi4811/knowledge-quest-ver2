@@ -460,6 +460,8 @@ export interface PlayerData {
   unlockedCards?: string[];
   foodItemsCount?: number;   // お世話用のごはんアイテム数
   inventory?: Record<string, InventoryItem>;
+  /** Persistent collection of treasures and equipment won from the gacha. */
+  gachaCollection?: Record<string, number>;
   itemUsageHistory?: ItemUsageHistoryEntry[];
   companionRoom?: CompanionRoomData;
   dailyMissions?: DailyMission[];

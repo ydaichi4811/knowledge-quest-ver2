@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { PlayerData, CompanionRoomData, CompanionRoomTheme } from '../types';
 import { ROOM_THEMES, FURNITURE_CATALOG, FurnitureItemDefinition } from '../services/itemAndRoomService';
 import { savePlayerData } from '../services/gameStorage';
@@ -319,3 +319,4 @@ export const CompanionRoomDecorationModal: React.FC<CompanionRoomDecorationModal
     </div>
   );
 };
+

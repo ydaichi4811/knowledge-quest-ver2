@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { NpcCompanionInfo } from '../services/encyclopediaService';
 import { COMPANION_ATTRIBUTES, COMPANION_RARITIES } from '../data/companionParts';
 import { Sparkles, BookOpen, X } from 'lucide-react';
@@ -95,3 +95,4 @@ export const NpcEncounterModal: React.FC<NpcEncounterModalProps> = ({
     </div>
   );
 };
+

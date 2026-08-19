@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { PlayerData } from '../types';
 import { HeroCharacter } from './game/HeroCharacter';
 import { BuddyCharacter } from './game/BuddyCharacter';
@@ -283,3 +283,4 @@ export const DailyMissionModal: React.FC<DailyMissionModalProps> = ({
     </div>
   );
 };
+

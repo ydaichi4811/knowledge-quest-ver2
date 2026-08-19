@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { PlayerData, InventoryItem } from '../types';
 import { useInventoryItem, NURTURING_ITEMS } from '../services/itemAndRoomService';
 import { savePlayerData } from '../services/gameStorage';
@@ -23,7 +23,7 @@ export const CompanionInventoryModal: React.FC<CompanionInventoryModalProps> = (
   const inventory = player.inventory || {};
   const itemsList = Object.keys(NURTURING_ITEMS).map((itemId) => {
     const def = NURTURING_ITEMS[itemId];
-    const quantity = inventory[itemId] || 0;
+    const quantity = inventory[itemId]?.quantity || 0;
     return {
       itemId,
       def,
@@ -162,3 +162,4 @@ export const CompanionInventoryModal: React.FC<CompanionInventoryModalProps> = (
     </div>
   );
 };
+

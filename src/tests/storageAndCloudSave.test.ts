@@ -26,6 +26,25 @@ describe('ストレージ・クラウド保存・互換性テスト', () => {
     expect(loaded?.points).toBe(350);
   });
 
+  it('⑨-b ガチャ・育成アイテム・部屋の成果が再起動後も残ること', () => {
+    player.gachaCollection = { ゴールドソード: 2 };
+    const knowledgeFruit = player.inventory!.knowledge_fruit;
+    player.inventory = {
+      ...(player.inventory || {}),
+      knowledge_fruit: {
+        ...knowledgeFruit,
+        quantity: 4,
+        lastObtainedAt: new Date().toISOString(),
+      },
+    };
+    savePlayerData(player);
+
+    const loaded = loadPlayerData();
+    expect(loaded?.gachaCollection?.ゴールドソード).toBe(2);
+    expect(loaded?.inventory?.knowledge_fruit?.quantity).toBe(4);
+    expect(loaded?.companionRoom).toBeDefined();
+  });
+
   // ⑩ Firebaseフォールバック
   it('⑩ Firebase未設定時または接続エラー時にローカル動作へ安全にフォールバックすること', async () => {
     // Call saveGameDataToCloud when Firebase is not configured in test environment
@@ -81,3 +100,4 @@ describe('ストレージ・クラウド保存・互換性テスト', () => {
     expect(loaded?.level).toBe(player.level);
   });
 });
+

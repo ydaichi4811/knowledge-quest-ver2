@@ -77,8 +77,20 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     }
   }, [todayStr]);
 
-  const coinAmount = player.points || 12345;
-  const gemAmount = Math.max(1234, Math.floor((player.points || 0) / 5) + (player.foodItemsCount || 0));
+  // A legitimate zero balance must remain zero. Placeholder balances make
+  // rewards and gacha costs impossible for children to understand.
+  const coinAmount = player.points ?? 0;
+  const gemAmount = Math.floor((player.points ?? 0) / 5) + (player.foodItemsCount ?? 0);
+  const dailyMissions = player.dailyMissions || [];
+  const completedMissionCount = dailyMissions.filter((mission) => mission.isCompleted).length;
+  const dailyMissionPercent = dailyMissions.length
+    ? Math.round((completedMissionCount / dailyMissions.length) * 100)
+    : 0;
+  const correctRate = player.totalAnswered > 0
+    ? Math.round((player.correctAnswered / player.totalAnswered) * 100)
+    : 0;
+  const firstClearCount = Object.values(player.questionProgress || {}).filter((progress) => progress.isFirstCleared).length;
+  const collectedTreasureCount = Object.values(player.gachaCollection || {}).reduce((sum, quantity) => sum + quantity, 0);
 
   const handleNavClick = (navKey: 'home' | 'quest' | 'pet' | 'gacha' | 'room' | 'log' | 'shop' | 'settings') => {
     setActiveNav(navKey);
@@ -91,6 +103,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       if (onSelectTab) onSelectTab('gacha');
     } else if (navKey === 'log') {
       if (onSelectTab) onSelectTab('review');
+    } else if (navKey === 'shop') {
+      // The current minimum complete loop uses the gacha as the reward shop.
+      // Never leave a visible navigation button as a dead end.
+      if (onSelectTab) onSelectTab('gacha');
     } else if (navKey === 'settings') {
       if (onSelectTab) onSelectTab('settings');
     }
@@ -107,7 +123,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         {/* ========================================================= */}
         {/* ■ 左固定メニュー (LEFT FIXED SIDEBAR NAV)                   */}
         {/* ========================================================= */}
-        <aside className="w-full lg:w-[220px] bg-gradient-to-b from-[#0f2446] via-[#0b1a36] to-[#071226] border-r-2 border-[#1c355e] p-3 flex flex-col justify-between shrink-0 relative z-20">
+        <aside className="w-full lg:w-[220px] bg-gradient-to-b from-[#0f2446] via-[#0b1a36] to-[#071226] border-b-2 lg:border-b-0 lg:border-r-2 border-[#1c355e] p-2.5 lg:p-3 flex flex-col justify-between shrink-0 relative z-20">
           
           {/* Top Logo */}
           <div>
@@ -132,7 +148,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </div>
 
             {/* Menu Nav Buttons */}
-            <nav className="space-y-2 mt-3">
+            <nav aria-label="メインメニュー" className="flex lg:block gap-2 lg:space-y-2 lg:mt-3 overflow-x-auto overscroll-x-contain pb-1 lg:pb-0 snap-x">
               {[
                 { id: 'home', label: 'ホーム', en: 'HOME', icon: Home },
                 { id: 'quest', label: 'クエスト', en: 'QUEST', icon: BookOpen },
@@ -140,7 +156,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 { id: 'gacha', label: 'ガチャ', en: 'GACHA', icon: Sparkles },
                 { id: 'room', label: 'ルーム', en: 'ROOM', icon: Armchair },
                 { id: 'log', label: 'ログ', en: 'LOG', icon: FileText },
-                { id: 'shop', label: 'ショップ', en: 'SHOP', icon: ShoppingBag },
+                { id: 'shop', label: '宝箱交換', en: 'REWARD', icon: ShoppingBag },
               ].map((item) => {
                 const IconComp = item.icon;
                 const isActive = activeNav === item.id;
@@ -148,7 +164,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.id as any)}
-                    className={`w-full py-2.5 px-3.5 rounded-xl font-bold transition-all flex items-center gap-3 cursor-pointer relative overflow-hidden border-2 ${
+                    className={`shrink-0 min-w-[116px] lg:min-w-0 lg:w-full snap-start py-2.5 px-3.5 rounded-xl font-bold transition-all flex items-center gap-3 cursor-pointer relative overflow-hidden border-2 ${
                       isActive
                         ? 'bg-gradient-to-r from-[#2178e6] to-[#1253a8] border-[#70b1ff] text-white shadow-[0_0_15px_rgba(33,120,230,0.6)] ring-1 ring-amber-300/80 scale-[1.02]'
                         : 'bg-gradient-to-b from-[#1b3d6c] to-[#11294a] border-[#2d5286] text-slate-200 hover:brightness-115 hover:border-[#4270ae] active:scale-98'
@@ -297,53 +313,26 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
                     {/* Quest List */}
                     <div className="space-y-2.5 my-3">
-                      
-                      {/* Quest Item 1 (CLEAR) */}
-                      <div className="bg-[#f2ebdc] border border-[#d8caaa] rounded-lg p-2.5 flex items-center justify-between gap-2 shadow-sm">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className="w-5 h-5 rounded bg-emerald-600 text-white flex items-center justify-center shrink-0 text-xs font-bold shadow">
-                            <Check className="w-3.5 h-3.5" />
+                      {dailyMissions.map((mission) => (
+                        <div key={mission.missionId} className="bg-[#f2ebdc] border border-[#d8caaa] rounded-lg p-2.5 flex items-center justify-between gap-2 shadow-sm">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className={`w-5 h-5 rounded flex items-center justify-center shrink-0 text-xs font-bold shadow ${mission.isCompleted ? 'bg-emerald-600 text-white' : 'border-2 border-[#a39270] bg-white'}`}>
+                              {mission.isCompleted ? <Check className="w-3.5 h-3.5" /> : mission.icon}
+                            </div>
+                            <span className="text-xs font-black text-[#382716] truncate">{mission.title}</span>
                           </div>
-                          <span className="text-xs font-black text-[#382716] truncate">
-                            面積の問題を10問とこう
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-xs font-bold text-[#6e5944] font-mono">10/10</span>
-                          <span className="rotate-[-10deg] border-2 border-red-600 text-red-600 font-black px-1.5 py-0.5 rounded text-[10px] tracking-wider uppercase bg-red-50/80 shadow-sm">
-                            CLEAR!
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Quest Item 2 (CLEAR) */}
-                      <div className="bg-[#f2ebdc] border border-[#d8caaa] rounded-lg p-2.5 flex items-center justify-between gap-2 shadow-sm">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className="w-5 h-5 rounded bg-emerald-600 text-white flex items-center justify-center shrink-0 text-xs font-bold shadow">
-                            <Check className="w-3.5 h-3.5" />
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="text-xs font-bold text-[#6e5944] font-mono">
+                              {Math.min(mission.currentValue, mission.targetValue)}/{mission.targetValue}
+                            </span>
+                            {mission.isCompleted && (
+                              <span className="rotate-[-6deg] border-2 border-red-600 text-red-600 font-black px-1.5 py-0.5 rounded text-[10px] tracking-wider bg-red-50/80 shadow-sm">
+                                CLEAR!
+                              </span>
+                            )}
                           </div>
-                          <span className="text-xs font-black text-[#382716] truncate">
-                            ログインしよう
-                          </span>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-xs font-bold text-[#6e5944] font-mono">1/1</span>
-                          <span className="rotate-[-10deg] border-2 border-red-600 text-red-600 font-black px-1.5 py-0.5 rounded text-[10px] tracking-wider uppercase bg-red-50/80 shadow-sm">
-                            CLEAR!
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Quest Item 3 (In Progress) */}
-                      <div className="bg-[#f2ebdc] border border-[#d8caaa] rounded-lg p-2.5 flex items-center justify-between gap-2 shadow-sm">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className="w-5 h-5 rounded border-2 border-[#a39270] bg-white shrink-0" />
-                          <span className="text-xs font-black text-[#382716] truncate">
-                            ペットにエサをあげよう
-                          </span>
-                        </div>
-                        <span className="text-xs font-bold text-[#6e5944] font-mono shrink-0">0/1</span>
-                      </div>
+                      ))}
                     </div>
 
                     {/* Quest Progress Bar */}
@@ -352,13 +341,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                         <span>クエスト達成度</span>
                         <div className="flex items-center gap-2">
                           <span className="text-2xl">🎁</span>
-                          <span className="text-[#a03612] text-xs">次のごほうびまで <strong className="text-sm">あと1つ！</strong></span>
+                          <span className="text-[#a03612] text-xs">
+                            {completedMissionCount === dailyMissions.length ? 'すべて達成！' : `あと${dailyMissions.length - completedMissionCount}つ`}
+                          </span>
                         </div>
                       </div>
                       <div className="w-full bg-[#c8b794] h-3.5 rounded-full overflow-hidden p-0.5 border border-[#aa9876] relative">
-                        <div className="bg-gradient-to-r from-[#2178e6] to-[#429eff] h-full rounded-full w-[66%]" />
+                        <div className="bg-gradient-to-r from-[#2178e6] to-[#429eff] h-full rounded-full transition-[width]" style={{ width: `${dailyMissionPercent}%` }} />
                         <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white drop-shadow">
-                          66%
+                          {dailyMissionPercent}%
                         </span>
                       </div>
                     </div>
@@ -367,7 +358,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     <div className="pt-2 border-t border-[#e5d8be] flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 text-xs font-extrabold text-[#382613]">
                         <span className="text-xl">🎁</span>
-                        <span>あと1つでボーナス！</span>
+                        <span>{completedMissionCount}/{dailyMissions.length} 達成・報酬を受け取ろう</span>
                       </div>
                       <button
                         onClick={() => setShowDailyMissionModal(true)}
@@ -386,9 +377,33 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               {/* 右側カラム (お知らせ / ランキング / EVENT / ミッション)     */}
               {/* ======================================================= */}
               <div className="xl:col-span-4 space-y-4">
+                <div className="bg-[#f5efe0] border-4 border-[#c5af83] rounded-2xl p-4 shadow-md space-y-3">
+                  <h3 className="font-black text-sm text-[#1a3863] flex items-center gap-2">
+                    <Trophy className="w-4 h-4 text-amber-600" /> 冒険の進め方
+                  </h3>
+                  <p className="text-xs font-bold leading-relaxed text-[#4a3622]">
+                    問題に正解してKQポイントと育成アイテムを集めよう。宝箱を開けたら、相棒の部屋でアイテムを使って育てられます。
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-1 gap-2">
+                    <button onClick={() => onNavigate('map')} className="rounded-xl border-2 border-blue-300 bg-gradient-to-b from-blue-600 to-blue-800 px-3 py-2.5 text-xs font-black text-white shadow hover:brightness-110">
+                      ① 問題に挑戦する
+                    </button>
+                    <button onClick={() => onSelectTab?.('gacha')} className="rounded-xl border-2 border-amber-300 bg-gradient-to-b from-amber-500 to-amber-700 px-3 py-2.5 text-xs font-black text-slate-950 shadow hover:brightness-110">
+                      ② 宝箱ガチャを開ける
+                    </button>
+                    <button onClick={onOpenCompanionRoom || onOpenPartnerCare} className="rounded-xl border-2 border-emerald-300 bg-gradient-to-b from-emerald-600 to-emerald-800 px-3 py-2.5 text-xs font-black text-white shadow hover:brightness-110">
+                      ③ 相棒を育てる
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-black">
+                    <div className="rounded-lg bg-amber-100 p-2 text-amber-900">{player.points} pt</div>
+                    <div className="rounded-lg bg-blue-100 p-2 text-blue-900">宝物 {collectedTreasureCount}個</div>
+                    <div className="rounded-lg bg-emerald-100 p-2 text-emerald-900">アイテム {Object.values(player.inventory || {}).reduce((sum, item) => sum + item.quantity, 0)}個</div>
+                  </div>
+                </div>
                 
                 {/* お知らせ (TOP RIGHT) */}
-                <div className="bg-[#f5efe0] border-4 border-[#c5af83] rounded-2xl p-3.5 shadow-md space-y-2">
+                <div className="hidden bg-[#f5efe0] border-4 border-[#c5af83] rounded-2xl p-3.5 shadow-md space-y-2">
                   <div className="flex items-center justify-between border-b border-[#ded1b6] pb-1.5">
                     <h3 className="font-black text-xs sm:text-sm text-[#3a2817] flex items-center gap-1.5">
                       <span className="text-base">📢</span> お知らせ
@@ -413,7 +428,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 </div>
 
                 {/* ランキング (MIDDLE RIGHT) */}
-                <div className="bg-[#f5efe0] border-4 border-[#c5af83] rounded-2xl p-3.5 shadow-md space-y-2.5">
+                <div className="hidden bg-[#f5efe0] border-4 border-[#c5af83] rounded-2xl p-3.5 shadow-md space-y-2.5">
                   <div className="flex items-center justify-between border-b border-[#ded1b6] pb-1.5">
                     <h3 className="font-black text-xs sm:text-sm text-[#1a3863] flex items-center gap-1.5">
                       ランキング <span className="text-[11px] text-[#5e4b38] font-bold">（学習時間：今週）</span>
@@ -480,7 +495,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 </div>
 
                 {/* Event, Mission, Login Bonus Horizontal Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-1 gap-2.5">
+                <div className="hidden grid-cols-1 sm:grid-cols-3 xl:grid-cols-1 gap-2.5">
                   
                   {/* EVENT Card */}
                   <div className="bg-[#f5efe0] border-2 border-[#c5af83] rounded-xl p-2.5 flex items-center justify-between shadow-sm relative overflow-hidden">
@@ -553,7 +568,27 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 </div>
 
                 {/* 4 Cards Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  {[
+                    { label: '解いた問題', value: `${player.totalAnswered}問`, note: `初回クリア ${firstClearCount}問`, icon: Edit3, color: 'text-emerald-700' },
+                    { label: '正答率', value: `${correctRate}%`, note: `${player.correctAnswered}/${player.totalAnswered || 0}問 正解`, icon: Target, color: 'text-orange-700' },
+                    { label: '連続正解', value: `${player.currentStreak}問`, note: '正解を重ねよう', icon: Flame, color: 'text-purple-700' },
+                    { label: '学習日数', value: `${player.studyDaysCount}日`, note: `Lv.${player.level}まで成長`, icon: Trophy, color: 'text-blue-700' },
+                  ].map((stat) => {
+                    const StatIcon = stat.icon;
+                    return (
+                      <div key={stat.label} className="bg-[#f9f5ea] border-2 border-[#ded1b6] rounded-xl p-3 shadow-inner">
+                        <div className="flex items-center gap-1.5 text-xs font-extrabold text-[#3a2817]">
+                          <StatIcon className={`w-4 h-4 ${stat.color}`} /> {stat.label}
+                        </div>
+                        <div className={`mt-3 text-xl font-black font-mono ${stat.color}`}>{stat.value}</div>
+                        <p className="mt-1 text-[10px] text-slate-500 font-bold">{stat.note}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   
                   {/* Card 1: 学習時間 */}
                   <div className="bg-[#f9f5ea] border-2 border-[#ded1b6] rounded-xl p-3 space-y-2 flex flex-col justify-between shadow-inner">
@@ -716,7 +751,23 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               </div>
 
               {/* 右側: 今週の学習時間の推移 (4 Cols on XL) */}
-              <div className="xl:col-span-4 bg-[#f5efe0] border-4 border-[#c5af83] rounded-2xl p-3.5 shadow-md flex flex-col justify-between space-y-2">
+              <div className="xl:col-span-4 bg-[#f5efe0] border-4 border-[#c5af83] rounded-2xl p-4 shadow-md flex flex-col justify-between space-y-3">
+                <h4 className="font-black text-sm text-[#1a3863]">次のおすすめ</h4>
+                <div className="rounded-xl border border-[#d5c3a0] bg-[#f9f5ea] p-3">
+                  <p className="text-xs font-black text-[#382613]">{player.points < 30 ? 'KQポイントをためよう！' : '宝箱を開けられます！'}</p>
+                  <p className="mt-1 text-[11px] font-bold text-[#6e5843]">
+                    {player.points < 30 ? `あと${30 - player.points}ポイントでガチャ1回` : `現在${player.points}ポイント。学習のごほうびを受け取ろう。`}
+                  </p>
+                </div>
+                <button
+                  onClick={() => player.points < 30 ? onNavigate('map') : onSelectTab?.('gacha')}
+                  className="rounded-xl border-2 border-[#5497f0] bg-gradient-to-b from-[#1d6ad2] to-[#104899] px-4 py-2.5 text-xs font-black text-white shadow hover:brightness-110"
+                >
+                  {player.points < 30 ? 'クエストへ行く' : 'ガチャへ行く'}
+                </button>
+              </div>
+
+              <div className="hidden xl:col-span-4 bg-[#f5efe0] border-4 border-[#c5af83] rounded-2xl p-3.5 shadow-md flex-col justify-between space-y-2">
                 <div className="flex items-center justify-between border-b border-[#ded1b6] pb-1.5">
                   <h4 className="font-black text-xs text-[#1a3863]">今週の学習時間の推移（分）</h4>
                   <HelpCircle className="w-4 h-4 text-[#8c7659] cursor-pointer" />
@@ -773,7 +824,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
           {/* Footer Note */}
           <footer className="bg-[#0a1832] text-slate-400 text-[10px] py-1.5 px-4 text-center border-t border-[#1a335a] font-mono">
-            ※画面は開発中のイメージです。実際の仕様とは異なる場合があります。
+            学習成果はこの端末に自動保存されます。次回も「つづきから」遊べます。
           </footer>
 
         </div>
@@ -784,11 +835,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <DailyMissionModal
           player={player}
           onClose={() => setShowDailyMissionModal(false)}
-          onClaimReward={(missionId) => {
-            const updatedMissions = (player.dailyMissions || []).map((m) =>
-              m.missionId === missionId ? { ...m, rewardClaimed: true } : m
-            );
-            const updated: PlayerData = { ...player, dailyMissions: updatedMissions };
+          onUpdatePlayer={(updated) => {
             savePlayerData(updated);
             if (onUpdatePlayer) onUpdatePlayer(updated);
           }}
@@ -804,7 +851,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             >
               ✕
             </button>
-            <CompanionZukanView player={player} />
+            <CompanionZukanView player={player} onClose={() => setShowZukanModal(false)} />
           </div>
         </div>
       )}
