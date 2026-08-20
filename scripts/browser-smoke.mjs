@@ -151,7 +151,7 @@ for (const target of targets) {
   await page.screenshot({ path: `${outputDir}/${target.name}-07-result.png`, fullPage: true });
   await assertNoHorizontalOverflow('result');
 
-  await page.getByRole('button', { name: /ホームへ戻る/ }).click();
+  await page.getByRole('button', { name: /ホームへ戻る/ }).last().click();
   await page.getByText('冒険の進め方').waitFor();
   await page.reload({ waitUntil: 'networkidle' });
   await page.getByText('冒険の進め方').waitFor();
