@@ -154,6 +154,7 @@ for (const target of targets) {
   await page.getByRole('button', { name: /ホームへ戻る/ }).last().click();
   await page.getByText('冒険の進め方').waitFor();
   await page.reload({ waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: 'ゲームをスタート' }).click();
   await page.getByText('冒険の進め方').waitFor();
   await page.getByText(`テスト${target.name === 'mobile' ? 'M' : 'D'}`, { exact: true }).first().waitFor();
   await page.screenshot({ path: `${outputDir}/${target.name}-08-persisted-home.png`, fullPage: true });
