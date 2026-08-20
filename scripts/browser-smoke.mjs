@@ -115,8 +115,9 @@ for (const target of targets) {
   await page.getByRole('button', { name: '相棒の部屋を閉じる' }).click();
   await page.getByText('冒険の進め方').waitFor();
   await page.getByRole('button', { name: /問題に挑戦する/ }).click();
-  await page.getByText('マスリア王国 冒険マップ').waitFor();
-  await page.getByText('はじまりの草原', { exact: true }).click();
+  const firstStage = page.getByText('はじまりの草原', { exact: true });
+  await firstStage.waitFor();
+  await firstStage.click();
   await page.getByRole('button', { name: /このクエストに挑戦する/ }).click();
   const questionHeader = page.getByText(/問題\s+\d+\s*\/\s*\d+/).first();
   await questionHeader.waitFor();
