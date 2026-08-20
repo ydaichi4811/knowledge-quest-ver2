@@ -50,7 +50,19 @@ for (const target of targets) {
     }
   };
 
+  const completeCompanionHatchingIfPresent = async () => {
+    const hatchButton = page.getByRole('button', { name: /タマゴを誕生させる/ });
+    if (await hatchButton.isVisible()) {
+      await page.screenshot({ path: `${outputDir}/${target.name}-hatching.png`, fullPage: true });
+      await hatchButton.click();
+      const departButton = page.getByRole('button', { name: /一緒に冒険へ出発/ });
+      await departButton.waitFor();
+      await departButton.click();
+    }
+  };
+
   const dismissBattleTutorialIfPresent = async () => {
+    await completeCompanionHatchingIfPresent();
     const tutorialButton = page.getByRole('button', { name: /わかった/ });
     const appeared = await tutorialButton
       .waitFor({ state: 'visible', timeout: 1200 })
