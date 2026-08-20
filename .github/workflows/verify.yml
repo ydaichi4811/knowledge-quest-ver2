@@ -35,3 +35,25 @@ jobs:
       - name: Build production app
         run: npm run build
 
+      - name: Install browser for visual smoke checks
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run desktop and mobile browser checks
+        run: |
+          npm run dev -- --port 4173 > /tmp/knowledge-quest-vite.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173 > /dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/browser-smoke.mjs
+
+      - name: Upload browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-quest-browser-smoke
+          path: artifacts/browser-smoke
+          if-no-files-found: warn
+

@@ -329,6 +329,15 @@ export default function App() {
           stageInfo={activeQuestStage.stageInfo}
           targetUnitId={activeQuestStage.targetUnitId}
           onClose={() => setActiveQuestStage(null)}
+          onReturnToMap={() => {
+            setActiveQuestStage(null);
+            setCurrentScreen('map');
+          }}
+          onReturnToHome={() => {
+            setActiveQuestStage(null);
+            setCurrentScreen('home');
+            setActiveTab('study');
+          }}
           onPlayerUpdate={(updated) => {
             console.log(`⑦/⑧ [App.tsx -> onPlayerUpdate] Received updated player. player.name=${updated.name}, EXP=${updated.exp}, KQ=${updated.points}`);
             savePlayerDataWithCloud(updated);
