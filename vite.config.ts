@@ -5,6 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    base: process.env.GITHUB_ACTIONS === 'true' ? '/knowledge-quest-ver2/' : '/',
     plugins: [react(), tailwindcss()],
     test: {
       globals: true,
@@ -25,3 +26,4 @@ export default defineConfig(() => {
     },
   };
 });
+
