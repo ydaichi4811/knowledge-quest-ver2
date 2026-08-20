@@ -54,7 +54,7 @@ for (const target of targets) {
     const hatchButton = page.getByRole('button', { name: /タマゴを誕生させる/ });
     if (await hatchButton.isVisible()) {
       await page.screenshot({ path: `${outputDir}/${target.name}-hatching.png`, fullPage: true });
-      await hatchButton.click();
+      await hatchButton.click({ force: true });
       const departButton = page.getByRole('button', { name: /一緒に冒険へ出発/ });
       await departButton.waitFor();
       await departButton.click();
