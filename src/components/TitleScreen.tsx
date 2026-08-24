@@ -8,7 +8,7 @@ interface TitleScreenProps {
   onOpenResetModal: () => void;
 }
 
-const BACKGROUND = '/assets/title/app-background.png';
+const BACKGROUND = `${import.meta.env.BASE_URL}assets/title/app-background.png`;
 export const TitleScreen: React.FC<TitleScreenProps> = ({
   saveData,
   onStartNew,
