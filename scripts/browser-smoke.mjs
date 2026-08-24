@@ -24,8 +24,15 @@ for (const target of targets) {
   const page = await context.newPage();
   const pageErrors = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
+  page.on('response', (response) => {
+    if (response.status() >= 400) {
+      pageErrors.push(`${response.status()} ${response.url()}`);
+    }
+  });
   page.on('console', (message) => {
-    if (message.type() === 'error') pageErrors.push(message.text());
+    if (message.type() === 'error' && !message.text().startsWith('Failed to load resource:')) {
+      pageErrors.push(message.text());
+    }
   });
 
   const assertNoHorizontalOverflow = async (screen) => {
