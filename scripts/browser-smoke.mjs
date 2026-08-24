@@ -58,6 +58,7 @@ for (const target of targets) {
       const departButton = page.getByRole('button', { name: /一緒に冒険へ出発/ });
       await departButton.waitFor();
       await departButton.click();
+      await departButton.waitFor({ state: 'hidden' });
     }
   };
 
