@@ -42,10 +42,13 @@ export const OFFICIAL_GACHA_ITEMS: GachaItemDef[] = [
   // スーパーレア (★3)
   { title: '家具チケット', icon: '🎟️', rarity: 'スーパーレア', stars: 3, type: 'item', exp: 50, pts: 60, nurturingItemId: 'star_fragment', desc: 'マイホームのおしゃれ家具を1個交換できるチケット！', chestIcon: '🟪', colorClass: 'border-purple-400 bg-purple-500/20 text-purple-200', badgeBg: 'bg-purple-600 text-white' },
   { title: '知識領の本', icon: '📘', rarity: 'スーパーレア', stars: 3, type: 'item', exp: 60, pts: 50, nurturingItemId: 'knowledge_fruit', desc: '古代マスリア王国の算数知識が詰まった必勝書！', chestIcon: '🟪', colorClass: 'border-purple-400 bg-purple-500/20 text-purple-200', badgeBg: 'bg-purple-600 text-white' },
+  { title: 'なかよしリボン', icon: '🎀', rarity: 'スーパーレア', stars: 3, type: 'item', exp: 55, pts: 50, nurturingItemId: 'friendship_ribbon', desc: '一緒に学んだ思い出を結び、相棒とのきずなを大きく深めるリボン！', chestIcon: '🟪', colorClass: 'border-purple-400 bg-purple-500/20 text-purple-200', badgeBg: 'bg-purple-600 text-white' },
+  { title: 'ふりかえりスープ', icon: '🥣', rarity: 'スーパーレア', stars: 3, type: 'item', exp: 55, pts: 50, nurturingItemId: 'review_soup', desc: '間違いを次の力に変えて、相棒の成長ときずなを同時に育てるスープ！', chestIcon: '🟪', colorClass: 'border-purple-400 bg-purple-500/20 text-purple-200', badgeBg: 'bg-purple-600 text-white' },
   { title: 'シルバーソード', icon: '🗡️✨', rarity: 'スーパーレア', stars: 3, type: 'equipment', exp: 50, pts: 50, desc: '鋭い銀光を放つ長剣。速算力を高める！', chestIcon: '🟪', colorClass: 'border-purple-400 bg-purple-500/20 text-purple-200', badgeBg: 'bg-purple-600 text-white' },
 
   // レア (★2)
   { title: '体力ポーション', icon: '🧪', rarity: 'レア', stars: 2, type: 'item', exp: 30, pts: 30, nurturingItemId: 'kizuna_milk', desc: '体力とやる気を一瞬でフル回復させる栄養ドリンク！', chestIcon: '🟦', colorClass: 'border-cyan-400 bg-cyan-500/20 text-cyan-200', badgeBg: 'bg-cyan-600 text-white' },
+  { title: 'がんばりパン', icon: '🥖', rarity: 'レア', stars: 2, type: 'item', exp: 35, pts: 30, nurturingItemId: 'effort_bread', desc: '何度でも挑戦する努力の力と、相棒の成長エネルギーを育てるパン！', chestIcon: '🟦', colorClass: 'border-cyan-400 bg-cyan-500/20 text-cyan-200', badgeBg: 'bg-cyan-600 text-white' },
   { title: 'アイアンソード', icon: '⚔️', rarity: 'レア', stars: 2, type: 'equipment', exp: 30, pts: 30, desc: '頑丈な鉄の剣。冒険の頼もしい相棒！', chestIcon: '🟦', colorClass: 'border-cyan-400 bg-cyan-500/20 text-cyan-200', badgeBg: 'bg-cyan-600 text-white' },
   { title: '学者の帽子', icon: '🎓', rarity: 'レア', stars: 2, type: 'equipment', exp: 30, pts: 30, desc: '思考力を高める魔法アカデミーの正装ハット！', chestIcon: '🟦', colorClass: 'border-cyan-400 bg-cyan-500/20 text-cyan-200', badgeBg: 'bg-cyan-600 text-white' },
 
