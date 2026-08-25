@@ -32,6 +32,15 @@ export const CompanionInventoryModal: React.FC<CompanionInventoryModalProps> = (
   });
 
   const comp = player.companion;
+  const uniqueCleared = Object.values(player.questionProgress || {}).filter((progress) => progress.isFirstCleared).length;
+  const reviewCount = (player.reviewedConcepts || []).length + (player.reviewSession?.isCompleted ? 1 : 0);
+  const growthGoal = !comp
+    ? '相棒を選ぶと育成目標が表示されます。'
+    : comp.stage === 'egg'
+      ? `誕生まで、あと ${Math.max(0, 50 - (comp.growthExp || 0))} 成長エネルギー`
+      : comp.stage === 'hatched'
+        ? `幼体へ：成長 ${Math.min(comp.growthExp || 0, 150)}/150・初クリア ${Math.min(uniqueCleared, 10)}/10・復習 ${Math.min(reviewCount, 1)}/1`
+        : '次は問題の初クリアと復習を重ねて、相棒のレア度アップを目指そう！';
 
   const handleUseItem = (itemId: string) => {
     if (isUsing) return; // Anti-double click protection
@@ -95,6 +104,15 @@ export const CompanionInventoryModal: React.FC<CompanionInventoryModalProps> = (
             </motion.div>
           )}
         </AnimatePresence>
+
+        <section className="rounded-2xl border border-emerald-400/40 bg-emerald-950/40 p-3.5">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-black text-emerald-200">
+            <span>🌱 今の育成ゴール</span>
+            <span>成長 {comp?.growthExp || 0} ／ きずな {comp?.bond || 0}</span>
+          </div>
+          <p className="mt-2 text-xs font-bold leading-relaxed text-slate-200">{growthGoal}</p>
+          <p className="mt-1 text-[10px] text-emerald-300">アイテムの効果を見て、育てたい力に合うものを選ぼう。</p>
+        </section>
 
         {/* Item Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[360px] overflow-y-auto pr-1">
