@@ -462,6 +462,8 @@ export interface PlayerData {
   inventory?: Record<string, InventoryItem>;
   /** Persistent collection of treasures and equipment won from the gacha. */
   gachaCollection?: Record<string, number>;
+  /** Total shop purchases by item ID. Optional for compatibility with older saves. */
+  shopPurchaseCounts?: Record<string, number>;
   itemUsageHistory?: ItemUsageHistoryEntry[];
   companionRoom?: CompanionRoomData;
   dailyMissions?: DailyMission[];
