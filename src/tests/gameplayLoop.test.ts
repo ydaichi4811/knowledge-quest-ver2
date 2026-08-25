@@ -33,6 +33,30 @@ describe('学習報酬から相棒育成までの循環', () => {
     expect(used.updatedPlayer.companion!.growthExp).toBe(initialGrowth + 30);
   });
 
+  it('努力・復習・きずなの新アイテムが、それぞれ異なる育成目的を持つ', () => {
+    let player = createInitialPlayer('育成目的勇者');
+    const initialGrowth = player.companion!.growthExp;
+    const initialBond = player.companion!.bond;
+
+    player = addInventoryItem(player, 'effort_bread', 1).updatedPlayer;
+    const effortResult = useInventoryItem(player, 'effort_bread');
+    expect(effortResult.success).toBe(true);
+    expect(effortResult.updatedPlayer.companion!.progressTraits.effortPoints).toBe(5);
+    expect(effortResult.updatedPlayer.companion!.growthExp).toBe(initialGrowth + 10);
+
+    player = addInventoryItem(effortResult.updatedPlayer, 'review_soup', 1).updatedPlayer;
+    const reviewResult = useInventoryItem(player, 'review_soup');
+    expect(reviewResult.success).toBe(true);
+    expect(reviewResult.updatedPlayer.companion!.growthExp).toBe(initialGrowth + 30);
+    expect(reviewResult.updatedPlayer.companion!.bond).toBe(initialBond + 5);
+
+    player = addInventoryItem(reviewResult.updatedPlayer, 'friendship_ribbon', 1).updatedPlayer;
+    const bondResult = useInventoryItem(player, 'friendship_ribbon');
+    expect(bondResult.success).toBe(true);
+    expect(bondResult.updatedPlayer.companion!.progressTraits.bondPoints).toBe(5);
+    expect(bondResult.updatedPlayer.companion!.bond).toBe(initialBond + 15);
+  });
+
   it('ミッション進行とガチャコレクションが保存後も復元される', () => {
     let player = createInitialPlayer('保存勇者');
     const mission = player.dailyMissions![0];
