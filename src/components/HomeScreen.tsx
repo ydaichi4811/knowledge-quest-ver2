@@ -104,9 +104,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     } else if (navKey === 'log') {
       if (onSelectTab) onSelectTab('review');
     } else if (navKey === 'shop') {
-      // The current minimum complete loop uses the gacha as the reward shop.
-      // Never leave a visible navigation button as a dead end.
-      if (onSelectTab) onSelectTab('gacha');
+      if (onSelectTab) onSelectTab('shop');
     } else if (navKey === 'settings') {
       if (onSelectTab) onSelectTab('settings');
     }
