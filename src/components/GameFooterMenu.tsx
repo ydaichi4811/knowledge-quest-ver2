@@ -10,6 +10,7 @@ export type MainTabType =
   | 'ranking'
   | 'zukan'
   | 'gacha'
+  | 'shop'
   | 'settings';
 
 export type NavTabType = MainTabType | 'map';
@@ -33,12 +34,13 @@ export const GameFooterMenu: React.FC<GameFooterMenuProps> = ({
     { id: 'review', label: '復習', icon: '📖' },
     { id: 'ranking', label: 'ランキング', icon: '🏆' },
     { id: 'gacha', label: 'ガチャ', icon: '🎁' },
+    { id: 'shop', label: 'ショップ', icon: '🛍️' },
     { id: 'settings', label: '設定', icon: '⚙️' },
   ];
 
   return (
     <nav className="w-full bg-slate-950/95 border-t-4 border-amber-500/80 shadow-[0_-10px_25px_rgba(0,0,0,0.95)] px-1 sm:px-3 py-2 relative z-40 backdrop-blur-md">
-      <div className="max-w-5xl mx-auto grid grid-cols-4 sm:grid-cols-8 gap-1.5 sm:gap-2">
+      <div className="max-w-6xl mx-auto grid grid-cols-3 sm:grid-cols-9 gap-1.5 sm:gap-2">
         {menuItems.map((item) => {
           const isSelected =
             item.id === 'map'

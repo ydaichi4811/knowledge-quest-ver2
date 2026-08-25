@@ -17,6 +17,7 @@ import { HomeScreen } from './components/HomeScreen';
 import { MainGameLayout } from './components/MainGameLayout';
 import { CharacterScreenView } from './components/CharacterScreenView';
 import { GachaScreenView } from './components/GachaScreenView';
+import { ShopScreenView } from './components/ShopScreenView';
 import { RankingScreenView } from './components/RankingScreenView';
 import { ZukanScreenView } from './components/ZukanScreenView';
 import { SettingsScreenView } from './components/SettingsScreenView';
@@ -273,6 +274,14 @@ export default function App() {
 
                 {activeTab === 'gacha' && (
                   <GachaScreenView
+                    player={player}
+                    onPlayerUpdate={(updated) => setPlayer(updated)}
+                    onOpenCompanionRoom={() => setShowCompanionRoomModal(true)}
+                  />
+                )}
+
+                {activeTab === 'shop' && (
+                  <ShopScreenView
                     player={player}
                     onPlayerUpdate={(updated) => setPlayer(updated)}
                     onOpenCompanionRoom={() => setShowCompanionRoomModal(true)}
