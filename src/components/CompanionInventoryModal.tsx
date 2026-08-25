@@ -32,7 +32,8 @@ export const CompanionInventoryModal: React.FC<CompanionInventoryModalProps> = (
   });
 
   const comp = player.companion;
-  const uniqueCleared = (Object.values(player.questionProgress || {}) as QuestionProgressData[])\n    .filter((progress) => progress.isFirstCleared).length;
+  const uniqueCleared = (Object.values(player.questionProgress || {}) as QuestionProgressData[])
+    .filter((progress) => progress.isFirstCleared).length;
   const reviewCount = (player.reviewedConcepts || []).length + (player.reviewSession?.isCompleted ? 1 : 0);
   const growthGoal = !comp
     ? '相棒を選ぶと育成目標が表示されます。'
