@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { createInitialPlayer, loadPlayerData, savePlayerData } from '../services/gameStorage';
 import { addInventoryItem, useInventoryItem } from '../services/itemAndRoomService';
 import { updateDailyMissionProgress } from '../services/dailyMissionService';
+import { purchaseShopProduct } from '../services/shopService';
 
 describe('学習報酬から相棒育成までの循環', () => {
   beforeEach(() => {
@@ -74,5 +75,28 @@ describe('学習報酬から相棒育成までの循環', () => {
     expect(restored?.gachaCollection?.ゴールドソード).toBe(1);
     expect(restored?.dailyMissions?.find((item) => item.missionId === mission.missionId)?.isCompleted).toBe(true);
   });
-});
 
+  it('ショップ購入はポイントと所持数を同時に更新する', () => {
+    const player = createInitialPlayer('買い物勇者');
+    const initialQuantity = player.inventory!.knowledge_fruit.quantity;
+
+    const purchased = purchaseShopProduct(player, 'knowledge_fruit');
+
+    expect(purchased.success).toBe(true);
+    expect(purchased.updatedPlayer.points).toBe(60);
+    expect(purchased.updatedPlayer.inventory!.knowledge_fruit.quantity).toBe(initialQuantity + 1);
+    expect(purchased.updatedPlayer.shopPurchaseCounts?.knowledge_fruit).toBe(1);
+  });
+
+  it('ポイント不足や無効な商品では残高と所持品を変更しない', () => {
+    const player = { ...createInitialPlayer('節約勇者'), points: 10 };
+
+    const insufficient = purchaseShopProduct(player, 'evolution_dew');
+    const invalid = purchaseShopProduct(player, 'unknown_item');
+
+    expect(insufficient.success).toBe(false);
+    expect(insufficient.updatedPlayer).toBe(player);
+    expect(invalid.success).toBe(false);
+    expect(invalid.updatedPlayer).toBe(player);
+  });
+});
