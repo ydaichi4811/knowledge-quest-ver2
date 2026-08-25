@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { PlayerData, InventoryItem } from '../types';
+import { PlayerData, InventoryItem, QuestionProgressData } from '../types';
 import { useInventoryItem, NURTURING_ITEMS } from '../services/itemAndRoomService';
 import { savePlayerData } from '../services/gameStorage';
 import { Package, Sparkles, X, Heart, Zap } from 'lucide-react';
@@ -32,7 +32,7 @@ export const CompanionInventoryModal: React.FC<CompanionInventoryModalProps> = (
   });
 
   const comp = player.companion;
-  const uniqueCleared = Object.values(player.questionProgress || {}).filter((progress) => progress.isFirstCleared).length;
+  const uniqueCleared = (Object.values(player.questionProgress || {}) as QuestionProgressData[])\n    .filter((progress) => progress.isFirstCleared).length;
   const reviewCount = (player.reviewedConcepts || []).length + (player.reviewSession?.isCompleted ? 1 : 0);
   const growthGoal = !comp
     ? '相棒を選ぶと育成目標が表示されます。'
