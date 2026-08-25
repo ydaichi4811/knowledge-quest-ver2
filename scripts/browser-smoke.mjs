@@ -102,7 +102,7 @@ for (const target of targets) {
   };
 
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
-  await page.getByText('Knowledge Quest', { exact: true }).waitFor();
+  await page.getByAltText('Knowledge Quest ナレッジクエスト').waitFor();
   await page.screenshot({ path: `${outputDir}/${target.name}-01-title.png`, fullPage: true });
   await assertNoHorizontalOverflow('title');
 
