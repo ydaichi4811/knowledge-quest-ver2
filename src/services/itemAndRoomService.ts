@@ -47,6 +47,33 @@ export const NURTURING_ITEMS: Record<string, ItemDefinition> = {
     icon: '🍪',
     effectLabel: '勇気ポイント +5',
   },
+  effort_bread: {
+    itemId: 'effort_bread',
+    itemType: 'trait',
+    name: 'がんばりパン',
+    description: '何度でも挑戦する力がわいてくる焼きたてパン。努力の進化傾向を育てます。',
+    rarity: 'rare',
+    icon: '🥖',
+    effectLabel: '努力ポイント +5・成長 +10',
+  },
+  review_soup: {
+    itemId: 'review_soup',
+    itemType: 'growth',
+    name: 'ふりかえりスープ',
+    description: '間違いを学び直した知恵が溶け込んだスープ。成長ときずなを一緒に増やします。',
+    rarity: 'epic',
+    icon: '🥣',
+    effectLabel: '成長エネルギー +20・きずな +3',
+  },
+  friendship_ribbon: {
+    itemId: 'friendship_ribbon',
+    itemType: 'bond',
+    name: 'なかよしリボン',
+    description: '一緒に学んだ思い出を結ぶ特別なリボン。相棒とのきずなを大きく深めます。',
+    rarity: 'epic',
+    icon: '🎀',
+    effectLabel: 'きずな度 +10・きずな傾向 +5',
+  },
   kizuna_milk: {
     itemId: 'kizuna_milk',
     itemType: 'bond',
@@ -530,6 +557,28 @@ export function useInventoryItem(
       effectType = 'courage';
       effectAmount = 5;
       dialogue = '「勇気のクッキー」サクサクだ！どんな難しい問題も倒せそう！';
+      break;
+    case 'effort_bread':
+      traits.effortPoints = (traits.effortPoints || 0) + 5;
+      energyGain = 10;
+      bondGain = 2;
+      effectType = 'effort';
+      effectAmount = 5;
+      dialogue = '「がんばりパン」で力がわいてきたよ！むずかしい問題にも、もう一度挑戦しよう！';
+      break;
+    case 'review_soup':
+      energyGain = 20;
+      bondGain = 3;
+      effectType = 'review_growth';
+      effectAmount = 20;
+      dialogue = '「ふりかえりスープ」で頭も心もぽかぽか！間違いが次の力になったよ！';
+      break;
+    case 'friendship_ribbon':
+      traits.bondPoints = (traits.bondPoints || 0) + 5;
+      bondGain = 10;
+      effectType = 'bond_trait';
+      effectAmount = 10;
+      dialogue = '「なかよしリボン」を結んでくれてありがとう！これからも一緒に学ぼうね！';
       break;
     case 'kizuna_milk':
       bondGain = 5;
