@@ -12,7 +12,7 @@ export const ALL_LEARNING_SKILLS: LearningSkill[] = [
     title: '九九',
     description: '1けたの数どうしのかけ算（1の段～9の段）をすらすら暗唱して答える力',
     prerequisiteSkillIds: [],
-    relatedQuestionIds: ['q_g2_1', 'q_g2_kuku_2', 'q_g2_kuku_3'],
+    relatedQuestionIds: ['q_g2_1', 'q_g2_kuku_2', 'q_g2_kuku_3', 'q_g2_kuku_4'],
     masteryThreshold: 90,
     icon: '🔢',
     mapPosition: { x: 100, y: 100 },
@@ -25,7 +25,7 @@ export const ALL_LEARNING_SKILLS: LearningSkill[] = [
     title: '簡単なかけ算',
     description: '「1つの数 × いくつ分」の考え方と文章題から式をつくる力',
     prerequisiteSkillIds: ['kuku'],
-    relatedQuestionIds: ['q_g2_2', 'q_g2_mult_2', 'q_g2_mult_3'],
+    relatedQuestionIds: ['q_g2_2', 'q_g2_mult_2', 'q_g2_mult_3', 'q_g2_mult_4'],
     masteryThreshold: 90,
     icon: '✖️',
     mapPosition: { x: 100, y: 220 },
@@ -42,7 +42,7 @@ export const ALL_LEARNING_SKILLS: LearningSkill[] = [
     title: '長さ',
     description: '定規を使った長さの測定と、mm・cmの基本概念',
     prerequisiteSkillIds: [],
-    relatedQuestionIds: ['q_g3_length_1', 'q_g3_length_2'],
+    relatedQuestionIds: ['q_g3_length_1', 'q_g3_length_2', 'q_g3_length_3'],
     masteryThreshold: 90,
     icon: '📏',
     mapPosition: { x: 400, y: 100 },
@@ -193,7 +193,7 @@ export const ALL_LEARNING_SKILLS: LearningSkill[] = [
     title: '三角形の面積',
     description: '【底辺 × 高さ ÷ 2】で求める三角形の面積公式と変形理解',
     prerequisiteSkillIds: ['rectangle_area', 'kuku'],
-    relatedQuestionIds: ['area_stage_3_q1', 'q_g5_tri_2'],
+    relatedQuestionIds: ['area_stage_3_q1', 'q_g5_tri_2', 'q_g5_tri_extra1', 'q_g5_tri_extra2', 'q_g5_tri_extra3'],
     masteryThreshold: 90,
     icon: '🔺',
     mapPosition: { x: 200, y: 820 },
@@ -254,3 +254,4 @@ export function getPrerequisitesForSkill(skillId: string): LearningSkill[] {
 export function getNextSkillsForSkill(skillId: string): LearningSkill[] {
   return ALL_LEARNING_SKILLS.filter((s) => s.prerequisiteSkillIds.includes(skillId));
 }
+
