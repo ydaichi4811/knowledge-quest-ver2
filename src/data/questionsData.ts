@@ -1,4 +1,5 @@
 import { LearningQuestion } from '../types';
+import { EXPANDED_LEARNING_QUESTIONS } from './expandedQuestions';
 
 export const ALL_LEARNING_QUESTIONS: LearningQuestion[] = [
   // ==========================================
@@ -722,6 +723,7 @@ export const ALL_LEARNING_QUESTIONS: LearningQuestion[] = [
     expReward: 55,
     pointReward: 40,
   },
+  ...EXPANDED_LEARNING_QUESTIONS,
 ];
 
 export function getQuestionById(id: string): LearningQuestion | undefined {
@@ -748,3 +750,4 @@ export function getPrerequisiteQuestions(prerequisiteId: string, limit = 3): Lea
   // Fallback: Return Grade 2-4 questions
   return ALL_LEARNING_QUESTIONS.filter((q) => q.grade <= 4).slice(0, limit);
 }
+
