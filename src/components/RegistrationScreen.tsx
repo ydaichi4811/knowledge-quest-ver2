@@ -84,6 +84,9 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="rounded-xl border border-emerald-400/40 bg-emerald-950/60 p-3 text-xs font-bold leading-relaxed text-emerald-100">
+            🌱 迷ったら、名前だけ入力して出発して大丈夫！ほかの項目はおすすめが選択済みです。
+          </div>
           {/* Step 1: Player Name Input */}
           <div className="space-y-2">
             <label className="flex items-center justify-between text-sm font-bold text-amber-200">
@@ -121,7 +124,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
           {/* Step 2: Game Mode Selection */}
           <div className="space-y-2">
             <label className="block text-sm font-bold text-amber-200">
-              2. プレイモード選択
+              2. 遊び方を選ぶ
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Adventure Mode */}
@@ -183,7 +186,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
           {/* Step 3: Avatar Class Selection */}
           <div className="space-y-2">
             <label className="block text-sm font-bold text-amber-200">
-              3. プレイヤーの見た目（職種）
+              3. 主人公の見た目を選ぶ
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {avatarOptions.map((av) => (
@@ -207,7 +210,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
           {/* Step 4: Initial Partner Selection */}
           <div className="space-y-2">
             <label className="block text-sm font-bold text-amber-200">
-              4. 最初の相棒モンスターを選ぶ
+              4. バトルで一緒に戦う相棒を選ぶ
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {PARTNERS_EVOLUTION_DATA.map((p) => {
@@ -249,7 +252,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
           {/* Step 5: Knowledge Companion Egg Selection */}
           <div className="space-y-2">
             <label className="block text-sm font-bold text-amber-200">
-              5. 授かる「知識の相棒タマゴ」を選ぶ <span className="text-xs text-emerald-400 font-normal">（属性や性格は誕生時のお楽しみ！）</span>
+              5. 学習で育てるペットのタマゴを選ぶ <span className="text-xs text-emerald-400 font-normal">（成長後の姿はお楽しみ！）</span>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               {eggChoices.map((egg) => {
@@ -293,3 +296,4 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
     </div>
   );
 };
+
