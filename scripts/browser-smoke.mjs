@@ -105,7 +105,7 @@ for (const target of targets) {
   if ((await page.locator('html').getAttribute('lang')) !== 'ja') {
     throw new Error(`${target.name}: document language must be ja`);
   }
-  await page.getByText('Knowledge Quest', { exact: true }).waitFor();
+  await page.getByRole('img', { name: 'Knowledge Quest ナレッジクエスト' }).waitFor();
   await page.screenshot({ path: `${outputDir}/${target.name}-01-title.png`, fullPage: true });
   await assertNoHorizontalOverflow('title');
 
