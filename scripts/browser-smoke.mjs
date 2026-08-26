@@ -122,7 +122,7 @@ for (const target of targets) {
   await assertNoHorizontalOverflow('home');
   await page.getByRole('button', { name: '問題に挑戦する', exact: true }).waitFor();
 
-  await page.getByRole('button', { name: /宝箱ガチャを開ける/ }).click();
+  await page.getByRole('button', { name: /ガチャ.*GACHA/ }).click();
   await page.getByText('マスリア王国の宝箱ガチャ').waitFor();
   await page.getByRole('button', { name: /1回引く/ }).click();
   await page.waitForTimeout(1800);
