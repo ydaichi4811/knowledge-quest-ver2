@@ -120,7 +120,7 @@ for (const target of targets) {
   await closeDailyMissionIfPresent();
   await page.screenshot({ path: `${outputDir}/${target.name}-03-home.png`, fullPage: true });
   await assertNoHorizontalOverflow('home');
-  await page.getByRole('button', { name: '問題に挑戦する' }).waitFor();
+  await page.getByRole('button', { name: '問題に挑戦する', exact: true }).waitFor();
 
   await page.getByRole('button', { name: /宝箱ガチャを開ける/ }).click();
   await page.getByText('マスリア王国の宝箱ガチャ').waitFor();
