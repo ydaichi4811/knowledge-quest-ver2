@@ -154,7 +154,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 { id: 'gacha', label: 'ガチャ', en: 'GACHA', icon: Sparkles },
                 { id: 'room', label: 'ルーム', en: 'ROOM', icon: Armchair },
                 { id: 'log', label: 'ログ', en: 'LOG', icon: FileText },
-                { id: 'shop', label: '宝箱交換', en: 'REWARD', icon: ShoppingBag },
+                { id: 'shop', label: 'ショップ', en: 'SHOP', icon: ShoppingBag },
               ].map((item) => {
                 const IconComp = item.icon;
                 const isActive = activeNav === item.id;
@@ -380,14 +380,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     <Trophy className="w-4 h-4 text-amber-600" /> 冒険の進め方
                   </h3>
                   <p className="text-xs font-bold leading-relaxed text-[#4a3622]">
-                    問題に正解してKQポイントと育成アイテムを集めよう。宝箱を開けたら、相棒の部屋でアイテムを使って育てられます。
+                    まず問題に挑戦しよう。正解して集めたKQポイントでごほうびを選び、相棒を育てられます。
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-1 gap-2">
                     <button onClick={() => onNavigate('map')} className="rounded-xl border-2 border-blue-300 bg-gradient-to-b from-blue-600 to-blue-800 px-3 py-2.5 text-xs font-black text-white shadow hover:brightness-110">
                       ① 問題に挑戦する
                     </button>
-                    <button onClick={() => onSelectTab?.('gacha')} className="rounded-xl border-2 border-amber-300 bg-gradient-to-b from-amber-500 to-amber-700 px-3 py-2.5 text-xs font-black text-slate-950 shadow hover:brightness-110">
-                      ② 宝箱ガチャを開ける
+                    <button onClick={() => onSelectTab?.('shop')} className="rounded-xl border-2 border-amber-300 bg-gradient-to-b from-amber-500 to-amber-700 px-3 py-2.5 text-xs font-black text-slate-950 shadow hover:brightness-110">
+                      ② ごほうびを選ぶ
                     </button>
                     <button onClick={onOpenCompanionRoom || onOpenPartnerCare} className="rounded-xl border-2 border-emerald-300 bg-gradient-to-b from-emerald-600 to-emerald-800 px-3 py-2.5 text-xs font-black text-white shadow hover:brightness-110">
                       ③ 相棒を育てる
@@ -752,16 +752,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               <div className="xl:col-span-4 bg-[#f5efe0] border-4 border-[#c5af83] rounded-2xl p-4 shadow-md flex flex-col justify-between space-y-3">
                 <h4 className="font-black text-sm text-[#1a3863]">次のおすすめ</h4>
                 <div className="rounded-xl border border-[#d5c3a0] bg-[#f9f5ea] p-3">
-                  <p className="text-xs font-black text-[#382613]">{player.points < 30 ? 'KQポイントをためよう！' : '宝箱を開けられます！'}</p>
+                  <p className="text-xs font-black text-[#382613]">{player.totalAnswered === 0 ? '最初の問題に挑戦しよう！' : player.points < 30 ? 'KQポイントをためよう！' : 'ごほうびを選べます！'}</p>
                   <p className="mt-1 text-[11px] font-bold text-[#6e5843]">
-                    {player.points < 30 ? `あと${30 - player.points}ポイントでガチャ1回` : `現在${player.points}ポイント。学習のごほうびを受け取ろう。`}
+                    {player.totalAnswered === 0 ? 'クエストで算数に答えると、ポイントと育成アイテムが手に入ります。' : player.points < 30 ? `あと${30 - player.points}ポイントでガチャ1回` : `現在${player.points}ポイント。ショップなら欲しい品を選べます。`}
                   </p>
                 </div>
                 <button
-                  onClick={() => player.points < 30 ? onNavigate('map') : onSelectTab?.('gacha')}
+                  onClick={() => player.totalAnswered === 0 || player.points < 30 ? onNavigate('map') : onSelectTab?.('shop')}
                   className="rounded-xl border-2 border-[#5497f0] bg-gradient-to-b from-[#1d6ad2] to-[#104899] px-4 py-2.5 text-xs font-black text-white shadow hover:brightness-110"
                 >
-                  {player.points < 30 ? 'クエストへ行く' : 'ガチャへ行く'}
+                  {player.totalAnswered === 0 || player.points < 30 ? '問題に挑戦する' : 'ショップへ行く'}
                 </button>
               </div>
 
