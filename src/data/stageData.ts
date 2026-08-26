@@ -257,6 +257,7 @@ export const AREA_STAGES: AreaStageDef[] = [
       'q_g5_tri_2',
       'q_g5_tri_extra1',
       'q_g5_tri_extra2',
+      'q_g5_tri_extra3',
     ],
     requiredClearCount: 3,
     totalQuestions: 5,
@@ -476,3 +477,4 @@ export function ensureStageProgress(player: PlayerData): PlayerData {
 
   return player;
 }
+
