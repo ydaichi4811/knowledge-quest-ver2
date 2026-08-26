@@ -102,11 +102,15 @@ for (const target of targets) {
   };
 
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
-  await page.getByAltText('Knowledge Quest ナレッジクエスト').waitFor();
+  if ((await page.locator('html').getAttribute('lang')) !== 'ja') {
+    throw new Error(`${target.name}: document language must be ja`);
+  }
+  await page.getByText('Knowledge Quest', { exact: true }).waitFor();
   await page.screenshot({ path: `${outputDir}/${target.name}-01-title.png`, fullPage: true });
   await assertNoHorizontalOverflow('title');
 
   await page.getByRole('button', { name: 'ゲームをスタート' }).click();
+  await page.getByText(/迷ったら、名前だけ入力して出発して大丈夫/).waitFor();
   await page.getByPlaceholder('なまえを入力（例: タロウ）').fill(`テスト${target.name === 'mobile' ? 'M' : 'D'}`);
   await page.screenshot({ path: `${outputDir}/${target.name}-02-registration.png`, fullPage: true });
   await assertNoHorizontalOverflow('registration');
@@ -116,6 +120,7 @@ for (const target of targets) {
   await closeDailyMissionIfPresent();
   await page.screenshot({ path: `${outputDir}/${target.name}-03-home.png`, fullPage: true });
   await assertNoHorizontalOverflow('home');
+  await page.getByRole('button', { name: '問題に挑戦する' }).waitFor();
 
   await page.getByRole('button', { name: /宝箱ガチャを開ける/ }).click();
   await page.getByText('マスリア王国の宝箱ガチャ').waitFor();
