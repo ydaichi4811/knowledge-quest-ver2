@@ -8,9 +8,12 @@ interface TitleScreenProps {
   onOpenResetModal: () => void;
 }
 
-const BACKGROUND = `${import.meta.env.BASE_URL}assets/title/app-background.png`;
-const TITLE_LOGO = `${import.meta.env.BASE_URL}assets/title/title-logo-final.png`;
-const START_BUTTON = `${import.meta.env.BASE_URL}assets/title/title-start-final.png`;
+// Public assets keep stable filenames on GitHub Pages. Bump this version when
+// replacing them so browsers do not reuse an older, broken transparent image.
+const TITLE_ASSET_VERSION = '20260827-1';
+const BACKGROUND = `${import.meta.env.BASE_URL}assets/title/app-background.png?v=${TITLE_ASSET_VERSION}`;
+const TITLE_LOGO = `${import.meta.env.BASE_URL}assets/title/title-logo-final.png?v=${TITLE_ASSET_VERSION}`;
+const START_BUTTON = `${import.meta.env.BASE_URL}assets/title/title-start-final.png?v=${TITLE_ASSET_VERSION}`;
 export const TitleScreen: React.FC<TitleScreenProps> = ({
   saveData,
   onStartNew,
@@ -34,12 +37,12 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
         src={BACKGROUND}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
+        className="absolute inset-0 z-0 h-full w-full object-cover object-center"
         draggable={false}
       />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white/5 via-transparent to-slate-950/25" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-white/5 via-transparent to-slate-950/25" />
 
-      <div className="mx-auto flex min-h-[100svh] w-full max-w-[1500px] flex-col items-center justify-between px-4 py-[clamp(1rem,4vh,3rem)] sm:px-8">
+      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1500px] flex-col items-center justify-between px-4 py-[clamp(1rem,4vh,3rem)] sm:px-8">
         <img
           src={TITLE_LOGO}
           alt="Knowledge Quest ナレッジクエスト"
