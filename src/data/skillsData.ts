@@ -254,4 +254,3 @@ export function getPrerequisitesForSkill(skillId: string): LearningSkill[] {
 export function getNextSkillsForSkill(skillId: string): LearningSkill[] {
   return ALL_LEARNING_SKILLS.filter((s) => s.prerequisiteSkillIds.includes(skillId));
 }
-

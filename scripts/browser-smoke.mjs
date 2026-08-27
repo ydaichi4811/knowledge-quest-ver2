@@ -185,4 +185,3 @@ if (failures.length) {
 }
 
 console.log('Desktop and mobile browser smoke checks passed.');
-

@@ -17,4 +17,3 @@ describe('子ども向け主要導線の表現', () => {
     expect(source).toContain("label: 'ショップ', en: 'SHOP'");
   });
 });
-

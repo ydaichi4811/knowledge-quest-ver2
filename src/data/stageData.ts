@@ -477,4 +477,3 @@ export function ensureStageProgress(player: PlayerData): PlayerData {
 
   return player;
 }
-

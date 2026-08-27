@@ -13,16 +13,24 @@ interface ShopScreenViewProps {
 }
 
 type ShopCategory = 'all' | ShopProduct['category'];
+
 const CATEGORY_LABELS: Record<ShopCategory, string> = {
-  all: 'すべて', growth: '成長', trait: '個性', bond: 'きずな', special: '特別',
+  all: 'すべて',
+  growth: '成長',
+  trait: '個性',
+  bond: 'きずな',
+  special: '特別',
 };
 
 export const ShopScreenView: React.FC<ShopScreenViewProps> = ({
-  player, onPlayerUpdate, onOpenCompanionRoom,
+  player,
+  onPlayerUpdate,
+  onOpenCompanionRoom,
 }) => {
   const [category, setCategory] = useState<ShopCategory>('all');
   const [message, setMessage] = useState('欲しい育成アイテムを選んで、確実に手に入れよう。');
-  const [purchased, setPurchased] = useState(false);
+  const [lastPurchasedItemId, setLastPurchasedItemId] = useState<string | null>(null);
+
   const products = useMemo(
     () => SHOP_PRODUCTS.filter((product) => category === 'all' || product.category === category),
     [category]
@@ -31,14 +39,15 @@ export const ShopScreenView: React.FC<ShopScreenViewProps> = ({
   const handlePurchase = (itemId: string) => {
     const result = purchaseShopProduct(player, itemId);
     setMessage(result.message);
-    setPurchased(result.success);
     if (!result.success) return;
+
     savePlayerData(result.updatedPlayer);
     onPlayerUpdate(result.updatedPlayer);
+    setLastPurchasedItemId(itemId);
   };
 
   return (
-    <div className="relative z-10 mx-auto my-auto w-full max-w-5xl space-y-5 p-3 text-slate-100 sm:p-5">
+    <div className="relative z-10 mx-auto my-auto w-full max-w-5xl space-y-5 p-3 sm:p-5 text-slate-100">
       <section className="royal-panel space-y-5 p-4 sm:p-6">
         <header className="flex flex-col gap-3 border-b-2 border-amber-500/40 pb-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
@@ -60,19 +69,27 @@ export const ShopScreenView: React.FC<ShopScreenViewProps> = ({
 
         <div className="grid grid-cols-5 gap-1.5">
           {(Object.keys(CATEGORY_LABELS) as ShopCategory[]).map((key) => (
-            <button key={key} type="button" onClick={() => setCategory(key)}
+            <button
+              key={key}
+              type="button"
+              onClick={() => setCategory(key)}
               className={`rounded-xl border px-1 py-2 text-[11px] font-black sm:text-xs ${
-                category === key ? 'border-amber-300 bg-amber-500 text-slate-950' : 'border-slate-700 bg-slate-900 text-slate-200 hover:border-amber-500/60'
-              }`}>
+                category === key
+                  ? 'border-amber-300 bg-amber-500 text-slate-950'
+                  : 'border-slate-700 bg-slate-900 text-slate-200 hover:border-amber-500/60'
+              }`}
+            >
               <FuriganaText text={CATEGORY_LABELS[key]} />
             </button>
           ))}
         </div>
 
         <div aria-live="polite" className={`rounded-xl border p-3 text-center text-xs font-black ${
-          purchased ? 'border-emerald-400/50 bg-emerald-950/70 text-emerald-200' : 'border-slate-700 bg-slate-950/80 text-slate-300'
+          lastPurchasedItemId
+            ? 'border-emerald-400/50 bg-emerald-950/70 text-emerald-200'
+            : 'border-slate-700 bg-slate-950/80 text-slate-300'
         }`}>
-          {purchased && <CheckCircle2 className="mr-1 inline h-4 w-4" />}
+          {lastPurchasedItemId && <CheckCircle2 className="mr-1 inline h-4 w-4" />}
           <FuriganaText text={message} />
         </div>
 
@@ -83,19 +100,29 @@ export const ShopScreenView: React.FC<ShopScreenViewProps> = ({
             const canBuy = player.points >= product.price;
             return (
               <article key={product.itemId} className="relative flex flex-col rounded-2xl border border-amber-500/35 bg-slate-950/90 p-4 shadow-lg">
-                {product.recommended && <span className="absolute right-2 top-2 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-black text-slate-950">おすすめ</span>}
+                {product.recommended && (
+                  <span className="absolute right-2 top-2 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-black text-slate-950">おすすめ</span>
+                )}
                 <div className="mb-2 text-4xl" aria-hidden="true">{item.icon}</div>
                 <h3 className="font-black text-amber-200"><FuriganaText text={item.name} /></h3>
                 <p className="mt-1 flex-1 text-xs leading-relaxed text-slate-300"><FuriganaText text={item.description} /></p>
-                <div className="mt-3 rounded-lg bg-slate-900 p-2 text-[11px] font-bold text-emerald-300"><FuriganaText text={item.effectLabel} /></div>
+                <div className="mt-3 rounded-lg bg-slate-900 p-2 text-[11px] font-bold text-emerald-300">
+                  <FuriganaText text={item.effectLabel} />
+                </div>
                 <div className="mt-3 flex items-center justify-between text-xs font-bold">
                   <span className="text-slate-400">所持 ×{owned}</span>
                   <span className="text-amber-300">{product.price} pt</span>
                 </div>
-                <button type="button" disabled={!canBuy} onClick={() => handlePurchase(product.itemId)}
+                <button
+                  type="button"
+                  disabled={!canBuy}
+                  onClick={() => handlePurchase(product.itemId)}
                   className={`mt-3 rounded-xl py-2.5 text-xs font-black ${
-                    canBuy ? 'btn-royal-gold cursor-pointer' : 'cursor-not-allowed border border-slate-700 bg-slate-800 text-slate-500'
-                  }`}>
+                    canBuy
+                      ? 'btn-royal-gold cursor-pointer'
+                      : 'cursor-not-allowed border border-slate-700 bg-slate-800 text-slate-500'
+                  }`}
+                >
                   {canBuy ? '1個購入する' : 'ポイント不足'}
                 </button>
               </article>

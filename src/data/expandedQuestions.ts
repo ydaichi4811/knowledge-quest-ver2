@@ -108,4 +108,3 @@ export const EXPANDED_LEARNING_QUESTIONS: LearningQuestion[] = [
     expReward: 55, pointReward: 40,
   },
 ];
-
