@@ -1,7 +1,7 @@
 import { PlayerData } from '../types';
 import { savePlayerData, registerSaveListener } from './gameStorage';
 import { saveGameDataToCloud, syncCloudAndLocalData, writeTestDocumentToFirestore } from './cloudSaveService';
-import { getCurrentUid, ensureAnonymousUser } from './authService';
+import { ensureCloudUser } from './authService';
 import { SyncStatusState } from '../types/cloudSave';
 import { isFirebaseConfigured } from '../lib/firebase';
 
@@ -26,10 +26,7 @@ function queueCloudSave(player: PlayerData) {
 
   saveDebounceTimer = setTimeout(async () => {
     try {
-      let uid = getCurrentUid();
-      if (!uid) {
-        uid = await ensureAnonymousUser();
-      }
+      const uid = await ensureCloudUser();
 
       if (uid) {
         const cloudSuccess = await saveGameDataToCloud(uid, player);
@@ -82,12 +79,11 @@ export function getSyncStatus(): SyncStatusState {
 export function savePlayerDataWithCloud(player: PlayerData, immediateCloud: boolean = true): boolean {
   const localRes = savePlayerData(player);
   if (immediateCloud && isFirebaseConfigured) {
-    const uid = getCurrentUid();
-    if (uid) {
-      saveGameDataToCloud(uid, player)
-        .then((ok) => notifyListeners(ok ? 'synced' : 'offline'))
-        .catch(() => notifyListeners('error'));
-    }
+    notifyListeners('syncing');
+    void ensureCloudUser()
+      .then((uid) => uid ? saveGameDataToCloud(uid, player) : false)
+      .then((ok) => notifyListeners(ok ? 'synced' : 'offline'))
+      .catch(() => notifyListeners('error'));
   }
   return localRes;
 }
@@ -96,7 +92,7 @@ export function savePlayerDataWithCloud(player: PlayerData, immediateCloud: bool
  * Explicit Firestore Test Write Function for Debugging/Verification UI
  */
 export async function runFirestoreTestWrite(player?: PlayerData | null) {
-  const uid = await ensureAnonymousUser();
+  const uid = await ensureCloudUser();
   if (!uid) {
     return {
       success: false,
@@ -128,7 +124,7 @@ export async function triggerManualSync(player: PlayerData): Promise<{ success: 
   notifyListeners('syncing');
 
   try {
-    const uid = await ensureAnonymousUser();
+    const uid = await ensureCloudUser();
     if (!uid) {
       notifyListeners('offline');
       return { success: false };
@@ -151,4 +147,3 @@ export async function triggerManualSync(player: PlayerData): Promise<{ success: 
     return { success: false };
   }
 }
-

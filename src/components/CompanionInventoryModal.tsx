@@ -181,4 +181,3 @@ export const CompanionInventoryModal: React.FC<CompanionInventoryModalProps> = (
     </div>
   );
 };
-

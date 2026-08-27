@@ -290,4 +290,3 @@ export const GachaScreenView: React.FC<GachaScreenViewProps> = ({
     </div>
   );
 };
-

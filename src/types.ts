@@ -587,4 +587,3 @@ export interface MathQuestion {
   explanationReadings?: ReadingItem[];
   hintReadings?: ReadingItem[];
 }
-

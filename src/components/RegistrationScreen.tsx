@@ -296,4 +296,3 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
     </div>
   );
 };
-

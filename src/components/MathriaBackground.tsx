@@ -16,4 +16,3 @@ export const MathriaBackground: React.FC = () => (
     <div className="absolute inset-0 bg-gradient-to-b from-sky-950/10 via-slate-950/15 to-slate-950/55" />
   </div>
 );
-

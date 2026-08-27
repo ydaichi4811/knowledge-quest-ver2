@@ -85,4 +85,3 @@ export const GameFooterMenu: React.FC<GameFooterMenuProps> = ({
     </nav>
   );
 };
-

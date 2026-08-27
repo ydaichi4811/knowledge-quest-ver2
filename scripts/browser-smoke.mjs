@@ -101,7 +101,10 @@ for (const target of targets) {
     }
   };
 
-  await page.goto(baseUrl, { waitUntil: 'networkidle' });
+  // Firebase keeps background connections open, so networkidle never becomes
+  // stable once cloud save is configured. The title image below is the real
+  // application-readiness assertion.
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   if ((await page.locator('html').getAttribute('lang')) !== 'ja') {
     throw new Error(`${target.name}: document language must be ja`);
   }
@@ -166,7 +169,7 @@ for (const target of targets) {
 
   await page.getByRole('button', { name: /ホームへ戻る/ }).last().click();
   await page.getByText('冒険の進め方').waitFor();
-  await page.reload({ waitUntil: 'networkidle' });
+  await page.reload({ waitUntil: 'domcontentloaded' });
   await page.getByRole('button', { name: 'ゲームをスタート' }).click();
   await page.getByText('冒険の進め方').waitFor();
   await page.getByText(`テスト${target.name === 'mobile' ? 'M' : 'D'}`, { exact: true }).first().waitFor();
@@ -185,4 +188,3 @@ if (failures.length) {
 }
 
 console.log('Desktop and mobile browser smoke checks passed.');
-
