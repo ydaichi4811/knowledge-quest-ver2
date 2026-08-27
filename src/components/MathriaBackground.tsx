@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SHARED_BACKGROUND = `${import.meta.env.BASE_URL}assets/title/app-background.png?v=20260827-1`;
+const SHARED_BACKGROUND = `${import.meta.env.BASE_URL}assets/title/app-background-v2.webp?v=20260827-2`;
 
 export const MathriaBackground: React.FC = () => (
   <div
