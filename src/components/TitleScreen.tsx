@@ -10,10 +10,10 @@ interface TitleScreenProps {
 
 // Public assets keep stable filenames on GitHub Pages. Bump this version when
 // replacing them so browsers do not reuse an older, broken transparent image.
-const TITLE_ASSET_VERSION = '20260827-1';
-const BACKGROUND = `${import.meta.env.BASE_URL}assets/title/app-background.png?v=${TITLE_ASSET_VERSION}`;
-const TITLE_LOGO = `${import.meta.env.BASE_URL}assets/title/title-logo-final.png?v=${TITLE_ASSET_VERSION}`;
-const START_BUTTON = `${import.meta.env.BASE_URL}assets/title/title-start-final.png?v=${TITLE_ASSET_VERSION}`;
+const TITLE_ASSET_VERSION = '20260827-2';
+const BACKGROUND = `${import.meta.env.BASE_URL}assets/title/app-background-v2.webp?v=${TITLE_ASSET_VERSION}`;
+const TITLE_LOGO = `${import.meta.env.BASE_URL}assets/title/title-logo-v2.webp?v=${TITLE_ASSET_VERSION}`;
+const START_BUTTON = `${import.meta.env.BASE_URL}assets/title/title-start-v2.webp?v=${TITLE_ASSET_VERSION}`;
 export const TitleScreen: React.FC<TitleScreenProps> = ({
   saveData,
   onStartNew,
