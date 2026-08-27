@@ -101,7 +101,10 @@ for (const target of targets) {
     }
   };
 
-  await page.goto(baseUrl, { waitUntil: 'networkidle' });
+  // Firebase keeps background connections open, so networkidle never becomes
+  // stable once cloud save is configured. The title image below is the real
+  // application-readiness assertion.
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   if ((await page.locator('html').getAttribute('lang')) !== 'ja') {
     throw new Error(`${target.name}: document language must be ja`);
   }
