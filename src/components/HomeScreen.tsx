@@ -162,6 +162,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 return (
                   <button
                     key={item.id}
+                    aria-label={`${item.label} ${item.en}`}
                     onClick={() => handleNavClick(item.id as any)}
                     className={`shrink-0 min-w-[88px] sm:min-w-[104px] lg:min-w-0 lg:w-full snap-start py-2 lg:py-2.5 px-2 lg:px-3.5 rounded-xl font-bold transition-all flex items-center gap-3 cursor-pointer relative overflow-hidden border-2 ${
                       isActive
