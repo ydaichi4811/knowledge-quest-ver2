@@ -58,6 +58,33 @@ export const OFFICIAL_GACHA_ITEMS: GachaItemDef[] = [
   { title: '冒険者のマント', icon: '🧥', rarity: 'ノーマル', stars: 1, type: 'equipment', exp: 15, pts: 15, desc: '風を防ぐ丈夫な旅用マント。', chestIcon: '📦', colorClass: 'border-slate-500 bg-slate-800/40 text-slate-300', badgeBg: 'bg-slate-700 text-white' },
 ];
 
+export const GACHA_COSTS = {
+  standard: 30,
+  premium: 100,
+} as const;
+
+export function selectGachaRarity(roll: number, premium: boolean): OfficialGachaRarity {
+  const value = Math.min(0.999999, Math.max(0, roll));
+  if (premium) {
+    if (value < 0.10) return 'レジェンド';
+    if (value < 0.35) return 'ウルトラレア';
+    if (value < 0.75) return 'スーパーレア';
+    return 'レア';
+  }
+  if (value < 0.02) return 'レジェンド';
+  if (value < 0.10) return 'ウルトラレア';
+  if (value < 0.30) return 'スーパーレア';
+  if (value < 0.65) return 'レア';
+  return 'ノーマル';
+}
+
+export function selectGachaItem(roll: number, premium: boolean, itemRoll = Math.random()): GachaItemDef {
+  const rarity = selectGachaRarity(roll, premium);
+  const candidates = OFFICIAL_GACHA_ITEMS.filter((item) => item.rarity === rarity);
+  const index = Math.min(candidates.length - 1, Math.floor(Math.max(0, itemRoll) * candidates.length));
+  return candidates[index];
+}
+
 export const GachaScreenView: React.FC<GachaScreenViewProps> = ({
   player,
   onPlayerUpdate,
@@ -80,30 +107,8 @@ export const GachaScreenView: React.FC<GachaScreenViewProps> = ({
 
     // Pick random result weighted slightly by rarity
     setTimeout(() => {
-      const rand = Math.random();
-      let selected: GachaItemDef;
-      const premium = cost >= 100;
-      if (rand < (premium ? 0.15 : 0.08)) {
-        // Legend ★5 (8%)
-        const legendItems = OFFICIAL_GACHA_ITEMS.filter((i) => i.rarity === 'レジェンド');
-        selected = legendItems[Math.floor(Math.random() * legendItems.length)];
-      } else if (rand < (premium ? 0.40 : 0.25)) {
-        // Ultra Rare ★4 (17%)
-        const urItems = OFFICIAL_GACHA_ITEMS.filter((i) => i.rarity === 'ウルトラレア');
-        selected = urItems[Math.floor(Math.random() * urItems.length)];
-      } else if (rand < (premium ? 0.70 : 0.50)) {
-        // Super Rare ★3 (25%)
-        const srItems = OFFICIAL_GACHA_ITEMS.filter((i) => i.rarity === 'スーパーレア');
-        selected = srItems[Math.floor(Math.random() * srItems.length)];
-      } else if (rand < (premium ? 0.90 : 0.75)) {
-        // Rare ★2 (25%)
-        const rareItems = OFFICIAL_GACHA_ITEMS.filter((i) => i.rarity === 'レア');
-        selected = rareItems[Math.floor(Math.random() * rareItems.length)];
-      } else {
-        // Normal ★1 (25%)
-        const normalItems = OFFICIAL_GACHA_ITEMS.filter((i) => i.rarity === 'ノーマル');
-        selected = normalItems[Math.floor(Math.random() * normalItems.length)];
-      }
+      const premium = cost >= GACHA_COSTS.premium;
+      const selected = selectGachaItem(Math.random(), premium);
 
       setGachaResult(selected);
       setChestStage('opened');
@@ -250,22 +255,26 @@ export const GachaScreenView: React.FC<GachaScreenViewProps> = ({
           {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-3 pt-2">
             <button
-              disabled={isSpinning}
-              onClick={() => handlePullGacha(30)}
+              disabled={isSpinning || player.points < GACHA_COSTS.standard}
+              onClick={() => handlePullGacha(GACHA_COSTS.standard)}
               className="btn-royal-gold py-3 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-1.5 shadow-lg"
             >
               <Sparkles className="w-4 h-4" />
-              <span>1回引く (30pt)</span>
+              <span>{player.points >= GACHA_COSTS.standard ? `1回引く (${GACHA_COSTS.standard}pt)` : `あと${GACHA_COSTS.standard - player.points}pt`}</span>
             </button>
 
             <button
-              disabled={isSpinning}
-              onClick={() => handlePullGacha(100)}
+              disabled={isSpinning || player.points < GACHA_COSTS.premium}
+              onClick={() => handlePullGacha(GACHA_COSTS.premium)}
               className="btn-royal-blue py-3 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-1.5 shadow-lg"
             >
               <Zap className="w-4 h-4" />
-              <span>豪華宝箱 (100pt)</span>
+              <span>{player.points >= GACHA_COSTS.premium ? `豪華宝箱 (${GACHA_COSTS.premium}pt)` : `あと${GACHA_COSTS.premium - player.points}pt`}</span>
             </button>
+          </div>
+          <div className="grid grid-cols-1 gap-1 text-[10px] font-bold text-slate-300 sm:grid-cols-2">
+            <div>通常：N 35% / R 35% / SR 20% / UR 8% / LEG 2%</div>
+            <div className="text-amber-300">豪華：レア以上確定 / SR以上 75%</div>
           </div>
         </div>
 
