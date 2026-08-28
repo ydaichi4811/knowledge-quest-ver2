@@ -8,6 +8,7 @@ import {
   COMPANION_EVOLUTION_TYPES,
 } from '../data/companionParts';
 import { BuddyCharacter } from './BuddyCharacter';
+import { getDiscoveredNpcCompanions } from '../services/encyclopediaService';
 import { BookOpen, Sparkles, X, Shield, Lock, CheckCircle2, ChevronRight, Award } from 'lucide-react';
 
 interface CompanionZukanViewProps {
@@ -23,8 +24,22 @@ export const CompanionZukanView: React.FC<CompanionZukanViewProps> = ({
   const [activeTab, setActiveTab] = useState<'species' | 'attributes' | 'rarities' | 'evolution'>('species');
   const [selectedItemId, setSelectedItemId] = useState<string | null>(comp.speciesId || 'mokoru');
 
-  const discoveredSpecies = new Set(comp.zukanDiscoveredSpecies || [comp.speciesId]);
-  const discoveredAttributes = new Set(comp.zukanDiscoveredAttributes || [comp.attribute]);
+  const encyclopedia = player.companionEncyclopedia;
+  const discoveredSpecies = new Set([
+    ...(comp.zukanDiscoveredSpecies || []),
+    ...(encyclopedia?.discoveredSpecies || []),
+    comp.speciesId,
+  ]);
+  const discoveredAttributes = new Set([
+    ...(comp.zukanDiscoveredAttributes || []),
+    ...(encyclopedia?.discoveredAttributes || []),
+    comp.attribute,
+  ]);
+  const discoveredRarities = new Set([
+    ...(encyclopedia?.discoveredRarities || []),
+    comp.currentRarity || 'N',
+  ]);
+  const discoveredNpcs = getDiscoveredNpcCompanions(player);
   const currentRarity = comp.currentRarity || 'N';
 
   const speciesList = Object.values(COMPANION_SPECIES);
@@ -80,7 +95,7 @@ export const CompanionZukanView: React.FC<CompanionZukanViewProps> = ({
           <div>
             <div className="text-[10px] text-slate-400 font-bold">到達レア度</div>
             <div className="text-sm font-black text-rose-300">
-              {currentRarity} ランク
+              {currentRarity} ランク（発見 {discoveredRarities.size}）
             </div>
           </div>
         </div>
@@ -143,6 +158,46 @@ export const CompanionZukanView: React.FC<CompanionZukanViewProps> = ({
 
         {/* Main Grid View */}
         <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+          <section className="rounded-2xl border border-sky-400/30 bg-sky-950/30 p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 className="text-sm font-black text-sky-200">🤝 出会った相棒</h3>
+                <p className="mt-1 text-[10px] font-semibold text-slate-400">
+                  冒険で出会った相棒は図鑑に保存されます。現在育てている相棒とは別のコレクションです。
+                </p>
+              </div>
+              <span className="rounded-full border border-sky-400/30 bg-sky-500/10 px-2.5 py-1 text-[10px] font-black text-sky-200">
+                {discoveredNpcs.length} / {5} 人
+              </span>
+            </div>
+            {discoveredNpcs.length > 0 ? (
+              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {discoveredNpcs.map((npc) => (
+                  <article key={npc.npcId} className="rounded-xl border border-slate-700 bg-slate-950/60 p-3">
+                    <div className="flex items-start gap-3">
+                      <div className="text-3xl" aria-hidden="true">{npc.avatarIcon}</div>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4 className="text-sm font-black text-amber-100">{npc.name}</h4>
+                          <span className="rounded-md bg-rose-500/20 px-1.5 py-0.5 text-[9px] font-black text-rose-200">
+                            {npc.rarity}
+                          </span>
+                        </div>
+                        <p className="text-[10px] font-bold text-sky-300">{npc.title}</p>
+                        <p className="mt-1 text-[10px] text-slate-400">出会った場所：{npc.encounterLocation}</p>
+                        <p className="mt-1 text-[10px] leading-relaxed text-slate-300">「{npc.dialogue}」</p>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 rounded-xl bg-slate-950/50 p-3 text-center text-xs font-bold text-slate-400">
+                クエストをクリアすると、新しい相棒に出会えることがあります。
+              </p>
+            )}
+          </section>
+
           {/* TAB 1: SPECIES ZUKAN */}
           {activeTab === 'species' && (
             <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
