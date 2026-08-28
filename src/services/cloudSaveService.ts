@@ -4,6 +4,29 @@ import { PlayerData } from '../types';
 import { loadPlayerData, savePlayerData, createInitialPlayer } from './gameStorage';
 
 /**
+ * Firestore rejects undefined values at any nesting level. Game data contains
+ * optional cosmetic fields, so remove only undefined entries while preserving
+ * Firestore sentinel values such as serverTimestamp().
+ */
+export function sanitizeFirestoreData<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value
+      .filter((item) => item !== undefined)
+      .map((item) => sanitizeFirestoreData(item)) as T;
+  }
+
+  if (value && typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype) {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .filter(([, item]) => item !== undefined)
+        .map(([key, item]) => [key, sanitizeFirestoreData(item)])
+    ) as T;
+  }
+
+  return value;
+}
+
+/**
  * Generates a random player code formatted like KQ-7F3A-92
  */
 export function generatePlayerCode(): string {
@@ -123,7 +146,7 @@ export async function saveGameDataToCloud(uid: string, player: PlayerData): Prom
       dataVersion: 1,
     };
 
-    await setDoc(gameDataRef, cloudGameDataPayload, { merge: true });
+    await setDoc(gameDataRef, sanitizeFirestoreData(cloudGameDataPayload), { merge: true });
 
     // 2. Save public profile to publicProfiles/{uid} for future ranking foundation
     const publicProfileRef = doc(db, 'publicProfiles', uid);
@@ -145,7 +168,7 @@ export async function saveGameDataToCloud(uid: string, player: PlayerData): Prom
       updatedAt: serverTimestamp(),
     };
 
-    await setDoc(publicProfileRef, publicPayload, { merge: true });
+    await setDoc(publicProfileRef, sanitizeFirestoreData(publicPayload), { merge: true });
 
     console.log('[CloudSave] Game data successfully saved to cloud.');
     return true;
