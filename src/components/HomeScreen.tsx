@@ -121,13 +121,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         {/* ========================================================= */}
         {/* ■ 左固定メニュー (LEFT FIXED SIDEBAR NAV)                   */}
         {/* ========================================================= */}
-        <aside className="w-full lg:w-[220px] bg-gradient-to-b from-[#0f2446] via-[#0b1a36] to-[#071226] border-b-2 lg:border-b-0 lg:border-r-2 border-[#1c355e] p-2.5 lg:p-3 flex flex-col justify-between shrink-0 relative z-20">
+        <aside className="w-full lg:w-[220px] bg-gradient-to-b from-[#0f2446] via-[#0b1a36] to-[#071226] border-b-2 lg:border-b-0 lg:border-r-2 border-[#1c355e] p-2 lg:p-3 flex flex-col justify-between shrink-0 relative z-20">
           
           {/* Top Logo */}
           <div>
-            <div className="flex items-center gap-2 px-2 py-3 mb-2 border-b border-[#1f3a68]">
+            <div className="flex items-center gap-2 px-2 py-2 lg:py-3 mb-1 lg:mb-2 border-b border-[#1f3a68]">
               <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 rounded-lg p-0.5 shadow-md flex items-center justify-center">
+                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 rounded-lg p-0.5 shadow-md flex items-center justify-center">
                   <div className="w-full h-full bg-[#0d2244] rounded-md flex items-center justify-center">
                     <BookOpen className="w-5 h-5 text-amber-300" />
                   </div>
@@ -155,6 +155,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 { id: 'room', label: 'ルーム', en: 'ROOM', icon: Armchair },
                 { id: 'log', label: 'ログ', en: 'LOG', icon: FileText },
                 { id: 'shop', label: 'ショップ', en: 'SHOP', icon: ShoppingBag },
+                { id: 'settings', label: '設定', en: 'SETTING', icon: Settings },
               ].map((item) => {
                 const IconComp = item.icon;
                 const isActive = activeNav === item.id;
@@ -162,7 +163,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.id as any)}
-                    className={`shrink-0 min-w-[116px] lg:min-w-0 lg:w-full snap-start py-2.5 px-3.5 rounded-xl font-bold transition-all flex items-center gap-3 cursor-pointer relative overflow-hidden border-2 ${
+                    className={`shrink-0 min-w-[88px] sm:min-w-[104px] lg:min-w-0 lg:w-full snap-start py-2 lg:py-2.5 px-2 lg:px-3.5 rounded-xl font-bold transition-all flex items-center gap-3 cursor-pointer relative overflow-hidden border-2 ${
                       isActive
                         ? 'bg-gradient-to-r from-[#2178e6] to-[#1253a8] border-[#70b1ff] text-white shadow-[0_0_15px_rgba(33,120,230,0.6)] ring-1 ring-amber-300/80 scale-[1.02]'
                         : 'bg-gradient-to-b from-[#1b3d6c] to-[#11294a] border-[#2d5286] text-slate-200 hover:brightness-115 hover:border-[#4270ae] active:scale-98'
@@ -173,7 +174,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     </div>
                     <div className="text-left leading-tight">
                       <div className="text-xs sm:text-sm font-extrabold tracking-wider">{item.label}</div>
-                      <div className="text-[9px] font-mono text-slate-300/80 font-bold">{item.en}</div>
+                      <div className="hidden sm:block text-[9px] font-mono text-slate-300/80 font-bold">{item.en}</div>
                     </div>
                   </button>
                 );
@@ -182,7 +183,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </div>
 
           {/* Bottom Settings Button */}
-          <div className="pt-3 border-t border-[#1f3a68] mt-4">
+          <div className="hidden lg:block pt-3 border-t border-[#1f3a68] mt-4">
             <button
               onClick={() => handleNavClick('settings')}
               className="w-full py-2 px-3 rounded-xl bg-gradient-to-b from-[#1c3860] to-[#112644] border-2 border-[#2f558a] text-slate-200 hover:text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow transition-all"
@@ -210,7 +211,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           {/* --------------------------------------------------------- */}
           {/* ■ 中央・右エリア コンテンツレイアウト                      */}
           {/* --------------------------------------------------------- */}
-          <div className="p-3 sm:p-5 space-y-5 overflow-y-auto max-h-[calc(100vh-120px)]">
+          <div className="p-3 sm:p-5 space-y-5 overflow-y-visible lg:overflow-y-auto lg:max-h-[calc(100vh-120px)]">
             
             {/* Upper Notebook Grid Section */}
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
