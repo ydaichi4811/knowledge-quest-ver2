@@ -16,8 +16,7 @@ export const CompanionInventoryModal: React.FC<CompanionInventoryModalProps> = (
   onUpdatePlayer,
   onClose,
 }) => {
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-  const [isUsing, setIsUsing] = useState(false);
+  const [usingItemId, setUsingItemId] = useState<string | null>(null);
   const [feedbackDialogue, setFeedbackDialogue] = useState<string | null>(null);
 
   const inventory = player.inventory || {};
@@ -44,8 +43,8 @@ export const CompanionInventoryModal: React.FC<CompanionInventoryModalProps> = (
         : '次は問題の初クリアと復習を重ねて、相棒のレア度アップを目指そう！';
 
   const handleUseItem = (itemId: string) => {
-    if (isUsing) return; // Anti-double click protection
-    setIsUsing(true);
+    if (usingItemId) return; // Anti-double click protection
+    setUsingItemId(itemId);
 
     const result = useInventoryItem(player, itemId);
     if (result.success) {
@@ -55,10 +54,10 @@ export const CompanionInventoryModal: React.FC<CompanionInventoryModalProps> = (
 
       setTimeout(() => {
         setFeedbackDialogue(null);
-        setIsUsing(false);
+        setUsingItemId(null);
       }, 3000);
     } else {
-      setIsUsing(false);
+      setUsingItemId(null);
     }
   };
 
@@ -119,6 +118,7 @@ export const CompanionInventoryModal: React.FC<CompanionInventoryModalProps> = (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[360px] overflow-y-auto pr-1">
           {itemsList.map(({ itemId, def, quantity }) => {
             const isSelectable = quantity > 0;
+            const isThisItemUsing = usingItemId === itemId;
 
             return (
               <div
@@ -152,15 +152,15 @@ export const CompanionInventoryModal: React.FC<CompanionInventoryModalProps> = (
 
                 <button
                   onClick={() => handleUseItem(itemId)}
-                  disabled={!isSelectable || isUsing}
+                  disabled={!isSelectable || usingItemId !== null}
                   className={`w-full py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md ${
-                    isSelectable && !isUsing
+                    isSelectable && usingItemId === null
                       ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 border border-amber-300'
                       : 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
                   }`}
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>{isUsing ? '使っています...' : '相棒に使う'}</span>
+                  <span>{isThisItemUsing ? '使っています...' : '相棒に使う'}</span>
                 </button>
               </div>
             );

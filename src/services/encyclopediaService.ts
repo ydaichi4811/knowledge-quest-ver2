@@ -147,3 +147,12 @@ export function checkStageClearNpcEncounter(
     isNewDiscovery,
   };
 }
+
+
+/**
+ * Returns the NPC companions the player has actually encountered.
+ */
+export function getDiscoveredNpcCompanions(player: PlayerData): NpcCompanionInfo[] {
+  const discoveredIds = new Set(player.companionEncyclopedia?.discoveredNpcIds || []);
+  return SAMPLE_NPC_COMPANIONS.filter((npc) => discoveredIds.has(npc.npcId));
+}
