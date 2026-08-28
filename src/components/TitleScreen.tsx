@@ -58,11 +58,6 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
           className="group relative mb-[clamp(0rem,2vh,1.5rem)] max-h-[30svh] w-[min(78vw,500px)] cursor-pointer border-0 bg-transparent p-0 transition-transform duration-150 hover:scale-[1.04] hover:brightness-110 active:translate-y-1 active:scale-[0.98] disabled:cursor-wait disabled:opacity-80 focus-visible:rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/90"
         >
           <img src={START_BUTTON} alt="" aria-hidden="true" className="h-auto max-h-[30svh] w-full select-none object-contain drop-shadow-[0_12px_10px_rgba(15,23,42,0.5)]" draggable={false} />
-          {(isStarting || saveData) && (
-            <span className="absolute inset-0 flex items-center justify-center pb-[2%] text-[clamp(1.25rem,4.5vw,2.5rem)] font-black tracking-[0.08em] text-white [text-shadow:0_3px_2px_#092d64]">
-              {isStarting ? '読み込み中…' : 'つづきから'}
-            </span>
-          )}
         </button>
       </div>
     </main>
