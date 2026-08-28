@@ -39,8 +39,8 @@ export const GameFooterMenu: React.FC<GameFooterMenuProps> = ({
   ];
 
   return (
-    <nav className="w-full bg-slate-950/95 border-t-4 border-amber-500/80 shadow-[0_-10px_25px_rgba(0,0,0,0.95)] px-1 sm:px-3 py-2 relative z-40 backdrop-blur-md">
-      <div className="max-w-6xl mx-auto grid grid-cols-3 sm:grid-cols-9 gap-1.5 sm:gap-2">
+    <nav aria-label="画面メニュー" className="w-full bg-slate-950/95 border-t-4 border-amber-500/80 shadow-[0_-10px_25px_rgba(0,0,0,0.95)] px-1 sm:px-3 py-2 relative z-40 backdrop-blur-md">
+      <div className="max-w-6xl mx-auto flex sm:grid sm:grid-cols-9 gap-1.5 sm:gap-2 overflow-x-auto sm:overflow-visible overscroll-x-contain snap-x pb-1 sm:pb-0">
         {menuItems.map((item) => {
           const isSelected =
             item.id === 'map'
@@ -51,7 +51,7 @@ export const GameFooterMenu: React.FC<GameFooterMenuProps> = ({
             <button
               key={item.id}
               onClick={() => onSelectTab(item.id)}
-              className={`relative flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 cursor-pointer ${
+              className={`relative shrink-0 min-w-[72px] sm:min-w-0 snap-start flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 cursor-pointer ${
                 isSelected
                   ? 'btn-royal-gold ring-2 ring-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.85)] scale-105 z-10 font-black'
                   : 'bg-slate-900/90 border-2 border-slate-700/80 hover:border-amber-400/60 text-slate-200 hover:scale-105'
