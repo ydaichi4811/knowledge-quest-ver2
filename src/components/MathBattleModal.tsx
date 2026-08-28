@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { PlayerData, LearningQuestion, QuestStage, ReviewSessionData } from '../types';
 import { ALL_LEARNING_QUESTIONS, getQuestionsBySkill, getPrerequisiteQuestions } from '../data/questionsData';
 import { REGIONS_DATA } from '../data/regions';
+import { AREA_STAGES } from '../data/stageData';
 import { getSkillById } from '../data/skillsData';
 import { addExpAndPoints, savePlayerData } from '../services/gameStorage';
 import { processQuestionAnswer, ProcessAnswerResult } from '../services/rewardService';
@@ -166,6 +167,30 @@ export function calculateQuestRank(accuracy: number, usedAnyHint: boolean): 'S' 
     return 'B';
   }
   return 'C';
+}
+
+export function calculateBattleOutcome({
+  firstTryCorrectCount,
+  eventualCorrectCount,
+  totalQuestions,
+  requiredClearCount,
+  usedAnyHint,
+}: {
+  firstTryCorrectCount: number;
+  eventualCorrectCount: number;
+  totalQuestions: number;
+  requiredClearCount: number;
+  usedAnyHint: boolean;
+}) {
+  const accuracy = totalQuestions > 0
+    ? Math.round((firstTryCorrectCount / totalQuestions) * 100)
+    : 0;
+  return {
+    accuracy,
+    rank: calculateQuestRank(accuracy, usedAnyHint),
+    isCleared: eventualCorrectCount >= requiredClearCount,
+    isPerfectClear: firstTryCorrectCount === totalQuestions && !usedAnyHint,
+  };
 }
 
 // =========================================================
@@ -508,6 +533,7 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
   const [usedAnyHint, setUsedAnyHint] = useState(false);
 
   const [sessionCorrectCount, setSessionCorrectCount] = useState(0);
+  const [sessionFirstTryCorrectCount, setSessionFirstTryCorrectCount] = useState(0);
   const [totalSessionExp, setTotalSessionExp] = useState(0);
   const [totalSessionPoints, setTotalSessionPoints] = useState(0);
   const [isBattleFinished, setIsBattleFinished] = useState(false);
@@ -521,6 +547,7 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
     elapsedTimeSeconds: number;
     accuracy: number;
     correctCount: number;
+    firstTryCorrectCount: number;
     totalQuestions: number;
     maxCombo: number;
     breakCount: number;
@@ -800,6 +827,9 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
 
       if (correct) {
         setSessionCorrectCount((prev) => prev + 1);
+        if (newAttemptCount === 1) {
+          setSessionFirstTryCorrectCount((prev) => prev + 1);
+        }
         setTotalSessionExp((prev) => prev + rewardRes.expGained);
         setTotalSessionPoints((prev) => prev + rewardRes.pointsGained);
 
@@ -1015,6 +1045,7 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
     setIsUltimateActivated(false);
     setEnemyHp(enemyInfo.maxHp);
     setSessionCorrectCount(0);
+    setSessionFirstTryCorrectCount(0);
     setTotalSessionExp(0);
     setTotalSessionPoints(0);
     setUsedAnyHint(false);
@@ -1029,20 +1060,24 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
   const finishBattle = () => {
     const elapsedTimeSeconds = Math.max(1, Math.floor((Date.now() - startTimeRef.current) / 1000));
     const totalQ = questions.length;
-    const accuracy = totalQ > 0 ? Math.round((sessionCorrectCount / totalQ) * 100) : 0;
-
-    // ランク計算場所
-    const rank = calculateQuestRank(accuracy, usedAnyHint);
+    const requiredClearCount = AREA_STAGES.find((stage) => stage.stageId === stageId)?.requiredClearCount
+      ?? Math.min(3, totalQ);
+    const { accuracy, rank, isCleared, isPerfectClear } = calculateBattleOutcome({
+      firstTryCorrectCount: sessionFirstTryCorrectCount,
+      eventualCorrectCount: sessionCorrectCount,
+      totalQuestions: totalQ,
+      requiredClearCount,
+      usedAnyHint,
+    });
 
     // 初回クリア判定場所
     const isFirstClear = Boolean(
+      isCleared &&
       stageId &&
         !player.completedQuests?.includes(stageId) &&
         !player.stageProgress?.[stageId]?.isCleared
     );
 
-    // 完全クリア判定場所
-    const isPerfectClear = sessionCorrectCount === totalQ && !usedAnyHint;
 
     // 報酬計算場所
     const rewardData = calculateQuestRewards({
@@ -1103,14 +1138,14 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
           existingProgress.bestStars,
           rank === 'S' ? 3 : rank === 'A' ? 2 : rank === 'B' ? 1 : 0
         ),
-        isCleared: true,
+        isCleared: existingProgress.isCleared || isCleared,
         isPerfectCleared: existingProgress.isPerfectCleared || isPerfectClear,
-        firstClearedAt: existingProgress.firstClearedAt || new Date().toISOString(),
+        firstClearedAt: existingProgress.firstClearedAt || (isCleared ? new Date().toISOString() : undefined),
         lastPlayedAt: new Date().toISOString(),
       };
     }
 
-    const updatedCompletedQuests = stageId
+    const updatedCompletedQuests = stageId && isCleared
       ? Array.from(new Set([...(player.completedQuests || []), stageId]))
       : player.completedQuests;
 
@@ -1131,23 +1166,26 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
     savePlayerData(updatedPlayer);
 
     // NPC 遭遇判定
-    const encounterRes = checkStageClearNpcEncounter(updatedPlayer);
-    if (encounterRes.encounteredNpc) {
-      onPlayerUpdate(encounterRes.updatedPlayer);
-      savePlayerData(encounterRes.updatedPlayer);
-      setNpcEncounter({
-        npc: encounterRes.encounteredNpc,
-        isNewDiscovery: encounterRes.isNewDiscovery,
-      });
+    if (isCleared) {
+      const encounterRes = checkStageClearNpcEncounter(updatedPlayer);
+      if (encounterRes.encounteredNpc) {
+        onPlayerUpdate(encounterRes.updatedPlayer);
+        savePlayerData(encounterRes.updatedPlayer);
+        setNpcEncounter({
+          npc: encounterRes.encounteredNpc,
+          isNewDiscovery: encounterRes.isNewDiscovery,
+        });
+      }
     }
 
     setLevelUpOccurred(leveledUp);
     setResultSummary({
-      isCleared: sessionCorrectCount > 0,
+      isCleared,
       rank,
       elapsedTimeSeconds,
       accuracy,
       correctCount: sessionCorrectCount,
+      firstTryCorrectCount: sessionFirstTryCorrectCount,
       totalQuestions: totalQ,
       maxCombo,
       breakCount,
@@ -1155,8 +1193,8 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
       usedAnyHint,
       isFirstClear,
       isPerfectClear,
-      expGained: rewardData.expGained,
-      coinsGained: rewardData.coinsGained,
+      expGained: totalSessionExp + rewardData.expGained,
+      coinsGained: totalSessionPoints + rewardData.coinsGained,
       gemsGained: rewardData.gemsGained,
       itemsGained: rewardData.itemsGained,
       partnerExpGained: rewardData.partnerExpGained,
@@ -1884,10 +1922,11 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
                 </div>
 
                 <div className="bg-slate-900 p-2.5 rounded-2xl border border-slate-800 space-y-0.5">
-                  <span className="text-[10px] text-slate-400 block font-bold">正答率 (正解数)</span>
+                  <span className="text-[10px] text-slate-400 block font-bold">初回正答率</span>
                   <span className="font-extrabold text-emerald-400 text-sm sm:text-base">
-                    🎯 {resultSummary?.accuracy}% ({resultSummary?.correctCount}/{resultSummary?.totalQuestions})
+                    🎯 {resultSummary?.accuracy}% ({resultSummary?.firstTryCorrectCount}/{resultSummary?.totalQuestions})
                   </span>
+                  <span className="text-[10px] text-slate-500 block">最終習得 {resultSummary?.correctCount}/{resultSummary?.totalQuestions}</span>
                 </div>
 
                 <div className="bg-slate-900 p-2.5 rounded-2xl border border-slate-800 space-y-0.5">
