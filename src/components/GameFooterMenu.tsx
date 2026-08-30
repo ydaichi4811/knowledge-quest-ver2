@@ -39,7 +39,7 @@ export const GameFooterMenu: React.FC<GameFooterMenuProps> = ({
   ];
 
   return (
-    <nav aria-label="画面メニュー" className="w-full bg-slate-950/95 border-t-4 border-amber-500/80 shadow-[0_-10px_25px_rgba(0,0,0,0.95)] px-1 sm:px-3 py-2 relative z-40 backdrop-blur-md">
+    <nav aria-label="画面メニュー" className="sticky bottom-0 w-full bg-slate-950/95 border-t-4 border-amber-500/80 shadow-[0_-10px_25px_rgba(0,0,0,0.95)] px-1 sm:px-3 py-2 z-40 backdrop-blur-md">
       <div className="max-w-6xl mx-auto flex sm:grid sm:grid-cols-9 gap-1.5 sm:gap-2 overflow-x-auto sm:overflow-visible overscroll-x-contain snap-x pb-1 sm:pb-0">
         {menuItems.map((item) => {
           const isSelected =
