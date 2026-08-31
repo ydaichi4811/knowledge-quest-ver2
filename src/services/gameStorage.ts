@@ -3,6 +3,7 @@ import {
   GameMode,
   AvatarOption,
   PartnerType,
+  ClassroomId,
   PartnerData,
   CharacterCustomizationData,
   PlayerStats,
@@ -137,6 +138,8 @@ function sanitizePlayerData(data: any): PlayerData {
   const basePlayer: PlayerData = {
     playerId: data.playerId || `user_${Math.random().toString(36).substring(2, 9)}`,
     classId: data.classId || 'class_5a',
+    studentNumber: Number.isInteger(data.studentNumber) ? data.studentNumber : undefined,
+    classroomLabel: data.classroomLabel,
     name: data.name || '算数勇者',
     nickname: data.nickname || data.name || '算数勇者',
     privacySetting: data.privacySetting || 'class',
@@ -267,7 +270,9 @@ export function createInitialPlayer(
   mode: GameMode = 'adventure',
   avatar: AvatarOption = 'hero',
   partnerType: PartnerType = 'fox',
-  eggType: string = 'egg_fluffy'
+  eggType: string = 'egg_fluffy',
+  classroomId: ClassroomId = 'class_1',
+  studentNumber: number = 1
 ): PlayerData {
   const basePartner = PARTNER_DEFAULTS[partnerType];
   const partnerData: PartnerData = {
@@ -289,7 +294,9 @@ export function createInitialPlayer(
 
   const newPlayer: PlayerData = {
     playerId: `usr_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-    classId: 'class_5a',
+    classId: classroomId,
+    studentNumber: Math.max(1, Math.min(40, Math.floor(studentNumber))),
+    classroomLabel: classroomId === 'class_1' ? '1組' : classroomId === 'class_2' ? '2組' : '3組',
     name: trimmedName,
     nickname: trimmedName,
     privacySetting: 'class',

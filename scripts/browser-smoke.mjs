@@ -113,7 +113,7 @@ for (const target of targets) {
   await assertNoHorizontalOverflow('title');
 
   await page.getByRole('button', { name: 'ゲームをスタート' }).click();
-  await page.getByText(/迷ったら、名前だけ入力して出発して大丈夫/).waitFor();
+  await page.getByText(/先生から指定された「組・出席番号」/).waitFor();
   await page.getByPlaceholder('なまえを入力（例: タロウ）').fill(`テスト${target.name === 'mobile' ? 'M' : 'D'}`);
   await page.screenshot({ path: `${outputDir}/${target.name}-02-registration.png`, fullPage: true });
   await assertNoHorizontalOverflow('registration');

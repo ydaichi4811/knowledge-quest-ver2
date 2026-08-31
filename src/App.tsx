@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GameScreen, PlayerData, GameMode, AvatarOption, PartnerType, PrivacySetting, QuestionProgressData, QuestStage } from './types';
+import { GameScreen, PlayerData, GameMode, AvatarOption, PartnerType, PrivacySetting, QuestionProgressData, QuestStage, ClassroomId } from './types';
 import {
   loadPlayerData,
   savePlayerData,
@@ -8,6 +8,7 @@ import {
   resetPlayerData,
 } from './services/gameStorage';
 import { ensureAnonymousUser } from './services/authService';
+import { claimClassroomSeat } from './services/classroomService';
 import { syncCloudAndLocalData } from './services/cloudSaveService';
 import { savePlayerDataWithCloud } from './services/saveSyncService';
 import { CloudSaveStatus } from './components/CloudSaveStatus';
@@ -112,18 +113,35 @@ export default function App() {
     }
   };
 
-  const handleRegister = (
+  const handleRegister = async (
     name: string,
     mode: GameMode,
     avatar: AvatarOption,
     partnerType: PartnerType,
-    eggType: string
-  ) => {
-    const newPlayer = createInitialPlayer(name, mode, avatar, partnerType, eggType);
+    eggType: string,
+    classroomId: ClassroomId,
+    studentNumber: number
+  ): Promise<{ success: boolean; error?: string }> => {
+    const uid = await ensureAnonymousUser();
+    const seatResult = await claimClassroomSeat(uid, classroomId, studentNumber);
+    if (!seatResult.success) {
+      return { success: false, error: seatResult.error };
+    }
+
+    const newPlayer = createInitialPlayer(
+      name,
+      mode,
+      avatar,
+      partnerType,
+      eggType,
+      classroomId,
+      studentNumber
+    );
     savePlayerDataWithCloud(newPlayer);
     setPlayer(newPlayer);
     setCurrentScreen('home');
     setActiveTab('study');
+    return { success: true };
   };
 
   const handleToggleMode = (newMode: GameMode) => {

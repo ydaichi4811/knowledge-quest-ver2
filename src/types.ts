@@ -31,6 +31,8 @@ export interface PartnerData {
 
 export type PrivacySetting = 'private' | 'class' | 'teacher_only';
 
+export type ClassroomId = 'class_1' | 'class_2' | 'class_3';
+
 export type HeroGender = 'boy' | 'girl';
 export type HeroViewType = 'sd' | 'portrait';
 export type HeroOutfitRank = 'novice' | 'royal' | 'knight' | 'master';
@@ -436,6 +438,8 @@ export interface ExperienceGrantResult {
 export interface PlayerData {
   playerId?: string;         // Unique ID for Firebase sync
   classId?: string;          // Class ID for school group ranking
+  studentNumber?: number;     // Attendance number (1-40)
+  classroomLabel?: string;    // Safe display label such as "1組"
   name: string;             // Max 10 chars
   nickname?: string;         // Display name for ranking/public
   privacySetting?: PrivacySetting;

@@ -70,6 +70,9 @@ export async function ensureUserDocument(uid: string, player: PlayerData): Promi
         uid,
         playerCode,
         displayName: '見習い冒険者',
+        classId: player.classId || 'legacy',
+        studentNumber: player.studentNumber || null,
+        classroomLabel: player.classroomLabel || null,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         lastLoginAt: serverTimestamp(),
@@ -159,6 +162,9 @@ export async function saveGameDataToCloud(uid: string, player: PlayerData): Prom
     const publicPayload = {
       playerCode,
       displayName: '見習い冒険者', // Default safe nickname
+      classId: player.classId || 'legacy',
+      studentNumber: player.studentNumber || null,
+      classroomLabel: player.classroomLabel || null,
       avatarId: player.avatar || 'hero',
       crestRank,
       companionId: player.partner?.id || 'leaf_fox',
