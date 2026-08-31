@@ -3,9 +3,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 describe('子ども向け主要導線の表現', () => {
-  it('初回登録で名前だけでも始められることを伝える', () => {
+  it('初回登録でクラス・番号とゲーム内名の入力を案内する', () => {
     const source = fs.readFileSync(path.resolve('src/components/RegistrationScreen.tsx'), 'utf8');
-    expect(source).toContain('名前だけ入力して出発して大丈夫');
+    expect(source).toContain('組・出席番号');
+    expect(source).toContain('ゲーム内で使うニックネーム');
     expect(source).toContain('バトルで一緒に戦う相棒');
     expect(source).toContain('学習で育てるペットのタマゴ');
   });
