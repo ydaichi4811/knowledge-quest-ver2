@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { GameMode, AvatarOption, PartnerType } from '../types';
+import { GameMode, AvatarOption, PartnerType, ClassroomId } from '../types';
 import { PARTNERS_EVOLUTION_DATA } from '../data/partners';
 import { User, Swords, Heart, Check, ArrowRight, ArrowLeft, ShieldAlert } from 'lucide-react';
 
@@ -10,8 +10,10 @@ interface RegistrationScreenProps {
     mode: GameMode,
     avatar: AvatarOption,
     partnerType: PartnerType,
-    eggType: string
-  ) => void;
+    eggType: string,
+    classroomId: ClassroomId,
+    studentNumber: number
+  ) => Promise<{ success: boolean; error?: string }>;
   onBackToTitle: () => void;
 }
 
@@ -24,6 +26,9 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarOption>('hero');
   const [selectedPartner, setSelectedPartner] = useState<PartnerType>('fox');
   const [selectedEgg, setSelectedEgg] = useState<string>('egg_fluffy');
+  const [classroomId, setClassroomId] = useState<ClassroomId>('class_1');
+  const [studentNumber, setStudentNumber] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const eggChoices = [
@@ -41,8 +46,9 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
     { id: 'scholar', name: '学者', icon: '📜', desc: '幾何学の真理を追究する研究者' },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     const trimmed = playerName.trim();
     if (!trimmed) {
       setErrorMsg('プレイヤー名を入力してください。');
@@ -53,7 +59,20 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
       return;
     }
     setErrorMsg('');
-    onRegister(trimmed, selectedMode, selectedAvatar, selectedPartner, selectedEgg);
+    setIsSubmitting(true);
+    const result = await onRegister(
+      trimmed,
+      selectedMode,
+      selectedAvatar,
+      selectedPartner,
+      selectedEgg,
+      classroomId,
+      studentNumber
+    );
+    if (!result.success) {
+      setErrorMsg(result.error || '登録できませんでした。先生に確認してください。');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -85,7 +104,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="rounded-xl border border-emerald-400/40 bg-emerald-950/60 p-3 text-xs font-bold leading-relaxed text-emerald-100">
-            🌱 迷ったら、名前だけ入力して出発して大丈夫！ほかの項目はおすすめが選択済みです。
+            🏫 先生から指定された「組・出席番号」を選び、ゲーム内で使うニックネームを入力してください。
           </div>
           {/* Step 1: Player Name Input */}
           <div className="space-y-2">
@@ -121,10 +140,56 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
             )}
           </div>
 
-          {/* Step 2: Game Mode Selection */}
+          {/* Step 2: Classroom Seat */}
+          <div className="space-y-3 rounded-2xl border-2 border-sky-400/40 bg-sky-950/50 p-4">
+            <div>
+              <h3 className="text-sm font-black text-sky-200">2. クラスと出席番号</h3>
+              <p className="mt-1 text-xs font-semibold text-slate-300">
+                先生から指定された組と番号を選んでください。同じ番号は重複登録できません。
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-2" role="group" aria-label="クラスを選ぶ">
+              {([
+                { id: 'class_1', label: '1組' },
+                { id: 'class_2', label: '2組' },
+                { id: 'class_3', label: '3組' },
+              ] as { id: ClassroomId; label: string }[]).map((classroom) => (
+                <button
+                  key={classroom.id}
+                  type="button"
+                  onClick={() => setClassroomId(classroom.id)}
+                  aria-pressed={classroomId === classroom.id}
+                  className={`rounded-xl border-2 px-3 py-3 text-sm font-black transition-all ${
+                    classroomId === classroom.id
+                      ? 'border-amber-300 bg-blue-600 text-white shadow-lg'
+                      : 'border-slate-600 bg-slate-900 text-slate-200 hover:border-sky-400'
+                  }`}
+                >
+                  {classroom.label}
+                </button>
+              ))}
+            </div>
+            <label className="block text-xs font-bold text-sky-100">
+              出席番号
+              <select
+                value={studentNumber}
+                onChange={(e) => setStudentNumber(Number(e.target.value))}
+                className="mt-2 w-full rounded-xl border-2 border-sky-400/40 bg-slate-900 px-4 py-3 text-base font-black text-white focus:border-amber-300 focus:outline-none"
+              >
+                {Array.from({ length: 40 }, (_, index) => index + 1).map((number) => (
+                  <option key={number} value={number}>{number}番</option>
+                ))}
+              </select>
+            </label>
+            <div className="rounded-xl bg-slate-950/60 px-3 py-2 text-center text-sm font-black text-amber-200">
+              登録先：{classroomId === 'class_1' ? '1組' : classroomId === 'class_2' ? '2組' : '3組'} {studentNumber}番
+            </div>
+          </div>
+
+          {/* Step 3: Game Mode Selection */}
           <div className="space-y-2">
             <label className="block text-sm font-bold text-amber-200">
-              2. 遊び方を選ぶ
+              3. 遊び方を選ぶ
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Adventure Mode */}
@@ -186,7 +251,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
           {/* Step 3: Avatar Class Selection */}
           <div className="space-y-2">
             <label className="block text-sm font-bold text-amber-200">
-              3. 主人公の見た目を選ぶ
+              4. 主人公の見た目を選ぶ
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {avatarOptions.map((av) => (
@@ -210,7 +275,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
           {/* Step 4: Initial Partner Selection */}
           <div className="space-y-2">
             <label className="block text-sm font-bold text-amber-200">
-              4. バトルで一緒に戦う相棒を選ぶ
+              5. バトルで一緒に戦う相棒を選ぶ
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {PARTNERS_EVOLUTION_DATA.map((p) => {
@@ -252,7 +317,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
           {/* Step 5: Knowledge Companion Egg Selection */}
           <div className="space-y-2">
             <label className="block text-sm font-bold text-amber-200">
-              5. 学習で育てるペットのタマゴを選ぶ <span className="text-xs text-emerald-400 font-normal">（成長後の姿はお楽しみ！）</span>
+              6. 学習で育てるペットのタマゴを選ぶ <span className="text-xs text-emerald-400 font-normal">（成長後の姿はお楽しみ！）</span>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               {eggChoices.map((egg) => {
@@ -285,9 +350,10 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
           <div className="pt-2">
             <button
               type="submit"
-              className="btn-gold w-full py-4 rounded-xl text-base font-extrabold flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+              disabled={isSubmitting}
+              className="btn-gold disabled:cursor-wait disabled:opacity-60 w-full py-4 rounded-xl text-base font-extrabold flex items-center justify-center gap-2 shadow-lg cursor-pointer"
             >
-              <span>この設定でマスリア王国へ旅立つ！</span>
+              <span>{isSubmitting ? 'クラスを確認しています…' : 'この設定でマスリア王国へ旅立つ！'}</span>
               <ArrowRight className="w-5 h-5" />
             </button>
           </div>

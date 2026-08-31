@@ -62,6 +62,11 @@ export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = ({
               <span className="text-[10px] sm:text-xs font-bold text-[#6b5235] truncate">
                 {player.name || '主人公'}
               </span>
+              {player.classroomLabel && player.studentNumber && (
+                <span className="rounded-full border border-sky-500/30 bg-sky-100 px-2 py-0.5 text-[9px] font-black text-sky-800 shrink-0">
+                  {player.classroomLabel} {player.studentNumber}番
+                </span>
+              )}
             </div>
 
             {/* EXP Bar */}
