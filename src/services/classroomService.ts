@@ -29,6 +29,11 @@ export async function claimClassroomSeat(
   const normalizedNumber = normalizeStudentNumber(studentNumber);
   const seatId = getClassroomSeatId(classroomId, normalizedNumber);
 
+  // Browser smoke tests must not consume real classroom seats.
+  if (import.meta.env.VITE_DISABLE_CLASSROOM_RESERVATION === 'true') {
+    return { success: true, seatId };
+  }
+
   if (!isFirebaseConfigured || !db || !uid) {
     return {
       success: false,

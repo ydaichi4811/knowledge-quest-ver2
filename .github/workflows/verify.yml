@@ -41,6 +41,8 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: Run desktop and mobile browser checks
+        env:
+          VITE_DISABLE_CLASSROOM_RESERVATION: 'true'
         run: |
           npm run dev -- --port 4173 > /tmp/knowledge-quest-vite.log 2>&1 &
           for attempt in {1..30}; do
