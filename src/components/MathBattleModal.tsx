@@ -442,6 +442,10 @@ export const MathBattleModal: React.FC<MathBattleModalProps> = ({
   const mainQuestions = ALL_LEARNING_QUESTIONS.filter((q) => {
     if (targetSkillId) return q.skillId === targetSkillId;
     if (targetUnitId) return q.unitId === targetUnitId || q.skillId === targetUnitId;
+    if (stageId === 'current_integer_5') return q.unitId === 'integer_5';
+    if (stageId === 'current_average_5') return q.unitId === 'average_5';
+    if (stageId === 'current_per_unit_5') return q.unitId === 'per_unit_5';
+    if (stageId === 'current_ratio_5_2') return q.unitId === 'ratio_5_2';
     if (stageId === 'area_stage_1') return q.unitId === 'area_5_rectangle';
     if (stageId === 'area_stage_2') return q.unitId === 'area_5_parallel';
     if (stageId === 'area_stage_3') return q.unitId === 'area_5_triangle';
