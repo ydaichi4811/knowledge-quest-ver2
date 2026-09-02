@@ -13,7 +13,8 @@ const scriptPath = resolve(dist, scriptMatch[1].replace(/^\.\//, '').replace(/^\
 const scriptCode = await readFile(scriptPath, 'utf8');
 // A literal closing script tag inside the bundle would terminate the inline element early.
 // Vite emits lowercase HTML tag strings, so replace them before embedding the bundle.
-const safeScriptCode = scriptCode.replaceAll('</script', '<\\/script');
+const escapedClosingTag = '<' + String.fromCharCode(92) + '/script';
+const safeScriptCode = scriptCode.replace(new RegExp('</script', 'gi'), escapedClosingTag);
 html = html.replace(scriptMatch[0], `<script type="module">\n${safeScriptCode}\n</script>`);
 
 const styleMatches = [...html.matchAll(/<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g)];
