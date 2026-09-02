@@ -18,6 +18,8 @@ import {
 import {
   checkRarityUpgradeRequirements,
   executeRarityUpgrade,
+  checkGrowthEvolutionRequirements,
+  executeGrowthEvolution,
 } from '../services/companionService';
 import {
   Sparkles,
@@ -60,6 +62,7 @@ export const CompanionProfileCard: React.FC<CompanionProfileCardProps> = ({
   const evoTypeInfo = COMPANION_EVOLUTION_TYPES[comp.evolutionType || 'hirameki'] || COMPANION_EVOLUTION_TYPES.hirameki;
 
   const upgradeStatus = checkRarityUpgradeRequirements(player);
+  const growthEvolutionStatus = checkGrowthEvolutionRequirements(player);
 
   const handleSaveName = () => {
     const trimmed = nameInput.trim().slice(0, 8);
@@ -81,6 +84,11 @@ export const CompanionProfileCard: React.FC<CompanionProfileCardProps> = ({
     if (!upgradeStatus.canUpgrade) return;
     const updated = executeRarityUpgrade(player);
     onUpdatePlayer(updated);
+  };
+
+  const handleGrowthEvolution = () => {
+    if (!growthEvolutionStatus.canEvolve) return;
+    onUpdatePlayer(executeGrowthEvolution(player));
   };
 
   const handleEquipAccessory = (accId: string | undefined) => {
@@ -323,6 +331,36 @@ export const CompanionProfileCard: React.FC<CompanionProfileCardProps> = ({
                   >
                     <Sparkles className="w-4 h-4" />
                     <span>進化条件達成！レア度【{upgradeStatus.nextRarity}】へ進化させる！</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="p-3.5 bg-slate-950/80 border border-emerald-500/30 rounded-xl space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-bold text-xs text-emerald-300 flex items-center gap-1.5">
+                    <TrendingUp className="w-4 h-4" />
+                    成長分岐：{growthEvolutionStatus.routeName}
+                  </span>
+                  <span className="text-[10px] px-2 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-200 font-bold">
+                    {evoTypeInfo.icon} {evoTypeInfo.name}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400">
+                  初回正解・復習・新単元・お世話・再挑戦のうち、最も育った資質で進化先が決まります。
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                  {growthEvolutionStatus.requirementsSummary.map((requirement) => (
+                    <div key={requirement} className="text-[11px] text-slate-300 flex gap-1.5">
+                      <span className="text-emerald-400">◆</span><span>{requirement}</span>
+                    </div>
+                  ))}
+                </div>
+                {growthEvolutionStatus.canEvolve && (
+                  <button
+                    onClick={handleGrowthEvolution}
+                    className="w-full py-2.5 rounded-lg text-xs font-black bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 shadow-lg cursor-pointer"
+                  >
+                    🌟 {growthEvolutionStatus.routeName}へ分岐進化する
                   </button>
                 )}
               </div>
