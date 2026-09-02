@@ -11,7 +11,9 @@ const scriptMatch = html.match(/<script[^>]*type="module"[^>]*src="([^"]+)"[^>]*
 if (!scriptMatch) throw new Error('Vite module script was not found in dist/index.html');
 const scriptPath = resolve(dist, scriptMatch[1].replace(/^\.\//, '').replace(/^\//, ''));
 const scriptCode = await readFile(scriptPath, 'utf8');
-html = html.replace(scriptMatch[0], `<script type="module">\n${scriptCode}\n</script>`);
+// A literal closing script tag inside the bundle would terminate the inline element early.
+const safeScriptCode = scriptCode.replace(/<\\/script/gi, '<\\\\/script');
+html = html.replace(scriptMatch[0], `<script type="module">\n${safeScriptCode}\n</script>`);
 
 const styleMatches = [...html.matchAll(/<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g)];
 for (const match of styleMatches) {
@@ -21,6 +23,10 @@ for (const match of styleMatches) {
 }
 
 html = html.replace('</head>', '<meta name="application-name" content="Knowledge Quest Offline"><\/head>');
+const closingScriptTags = html.match(/<\\/script>/gi) || [];
+if (closingScriptTags.length !== 1) {
+  throw new Error(`Offline HTML must contain exactly one closing script tag; found ${closingScriptTags.length}`);
+}
 await writeFile(indexPath, html, 'utf8');
 await writeFile(resolve(dist, 'オフライン版の使い方.txt'), [
   'Knowledge Quest Ver.2 オフライン版',
