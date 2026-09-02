@@ -11,9 +11,11 @@ const scriptMatch = html.match(/<script[^>]*type="module"[^>]*src="([^"]+)"[^>]*
 if (!scriptMatch) throw new Error('Vite module script was not found in dist/index.html');
 const scriptPath = resolve(dist, scriptMatch[1].replace(/^\.\//, '').replace(/^\//, ''));
 const scriptCode = await readFile(scriptPath, 'utf8');
-// Encode the bundle as a data URL so bundle text can never terminate the HTML script element.
-const scriptDataUrl = `data:text/javascript;base64,${Buffer.from(scriptCode, 'utf8').toString('base64')}`;
-html = html.replace(scriptMatch[0], `<script type="module" src="${scriptDataUrl}"></script>`);
+// Keep the HTML parser away from bundle text and execute it as a classic script.
+// file:// pages can block module data URLs, while this bootstrap works fully offline.
+const scriptBase64 = Buffer.from(scriptCode, 'utf8').toString('base64');
+const bootstrap = `(()=>{const s=document.createElement('script');s.textContent=atob('${scriptBase64}');document.head.appendChild(s)})()`;
+html = html.replace(scriptMatch[0], `<script>${bootstrap}</script>`);
 
 const styleMatches = [...html.matchAll(/<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g)];
 for (const match of styleMatches) {
