@@ -1,7 +1,9 @@
 import { LearningQuestion } from '../types';
+import { GRADE5_CURRENT_UNIT_QUESTIONS } from './grade5CurrentUnitQuestions';
 import { EXPANDED_LEARNING_QUESTIONS } from './expandedQuestions';
 
 export const ALL_LEARNING_QUESTIONS: LearningQuestion[] = [
+  ...GRADE5_CURRENT_UNIT_QUESTIONS,
   // ==========================================
   // GRADE 2: 九九 & 簡単なかけ算
   // ==========================================
