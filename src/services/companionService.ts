@@ -227,6 +227,13 @@ export function calculateEvolutionType(comp: CompanionData): CompanionEvolutionT
   return traitEntries[0].type;
 }
 
+MethodInvocationException: 
+Line |
+   2 |  … * Updates progress traits',$start)}; $t.Substring($start,$end-$start)
+     |                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Exception calling "Substring" with "2" argument(s): "length ('-7303') must be a non-negative value. (Parameter 'length')
+Actual value was -7303."
+
 /**
  * Updates progress traits (insight, effort, adventure, bond, courage) and checks evolution type
  */
