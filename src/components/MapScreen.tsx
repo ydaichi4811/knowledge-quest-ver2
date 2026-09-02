@@ -80,7 +80,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   onStartQuest,
   onOpenPretest,
 }) => {
-  const [selectedRegionId, setSelectedRegionId] = useState<string>('area');
+  const [selectedRegionId, setSelectedRegionId] = useState<string>('grade5_current');
   const [activeStageModal, setActiveStageModal] = useState<QuestStage | null>(null);
   const [lockedNotice, setLockedNotice] = useState<string | null>(null);
 
