@@ -181,12 +181,12 @@ export const GachaScreenView: React.FC<GachaScreenViewProps> = ({
           <div className="text-[11px] font-bold text-amber-300 mb-2">✨ 登場レアリティ一覧</div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1 text-[10px] font-bold">
             {([
-              ['📦', 'ノーマル', '★', '39% / 特別0%'],
-              ['🟦', 'レア', '★★', '25% / 特別35%'],
-              ['🟪', 'Sレア', '★★★', '20% / 特別35%'],
-              ['🟥', 'Uレア', '★★★★', '10% / 特別18%'],
-              ['🐲', 'レジェンド', '★★★★★', '5% / 特別10%'],
-              ['🌈', 'シークレット', '★★★★★★', '1% / 特別2%'],
+              ['📦', 'ノーマル', '★', '39% / 0%'],
+              ['🟦', 'レア', '★★', '25% / 35%'],
+              ['🟪', 'Sレア', '★★★', '20% / 35%'],
+              ['🟥', 'Uレア', '★★★★', '10% / 18%'],
+              ['🐲', 'レジェンド', '★★★★★', '5% / 10%'],
+              ['🌈', 'シークレット', '★★★★★★', '1% / 2%'],
             ] as const).map(([icon, name, stars, rates]) => (
               <div key={name} className="p-1.5 rounded-lg border border-amber-500/30 bg-slate-900/80 text-amber-100">
                 <div>{icon} {name}</div>
