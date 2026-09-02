@@ -1,5 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import { resolve, dirname, basename } from 'node:path';
+import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -12,7 +12,8 @@ if (!scriptMatch) throw new Error('Vite module script was not found in dist/inde
 const scriptPath = resolve(dist, scriptMatch[1].replace(/^\.\//, '').replace(/^\//, ''));
 const scriptCode = await readFile(scriptPath, 'utf8');
 // A literal closing script tag inside the bundle would terminate the inline element early.
-const safeScriptCode = scriptCode.replace(/<\\/script/gi, '<\\\\/script');
+// Vite emits lowercase HTML tag strings, so replace them before embedding the bundle.
+const safeScriptCode = scriptCode.replaceAll('</script', '<\\/script');
 html = html.replace(scriptMatch[0], `<script type="module">\n${safeScriptCode}\n</script>`);
 
 const styleMatches = [...html.matchAll(/<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g)];
@@ -22,8 +23,8 @@ for (const match of styleMatches) {
   html = html.replace(match[0], `<style>\n${css}\n</style>`);
 }
 
-html = html.replace('</head>', '<meta name="application-name" content="Knowledge Quest Offline"><\/head>');
-const closingScriptTags = html.match(/<\\/script>/gi) || [];
+html = html.replace('</head>', '<meta name="application-name" content="Knowledge Quest Offline"></head>');
+const closingScriptTags = html.match(/<\/script>/gi) || [];
 if (closingScriptTags.length !== 1) {
   throw new Error(`Offline HTML must contain exactly one closing script tag; found ${closingScriptTags.length}`);
 }
