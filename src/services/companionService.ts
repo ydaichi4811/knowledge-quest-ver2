@@ -227,12 +227,114 @@ export function calculateEvolutionType(comp: CompanionData): CompanionEvolutionT
   return traitEntries[0].type;
 }
 
-MethodInvocationException: 
-Line |
-   2 |  … * Updates progress traits',$start)}; $t.Substring($start,$end-$start)
-     |                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     | Exception calling "Substring" with "2" argument(s): "length ('-7303') must be a non-negative value. (Parameter 'length')
-Actual value was -7303."
+export const COMPANION_BRANCH_NAMES: Record<CompanionEvolutionType, string> = {
+  hirameki: '星賢ルート',
+  doryoku: '錬磨ルート',
+  bouken: '天空冒険ルート',
+  kizuna: '守護精霊ルート',
+  yuuki: '不屈勇者ルート',
+};
+
+export interface GrowthEvolutionStatus {
+  canEvolve: boolean;
+  nextStage?: 'grown' | 'evolved';
+  evolutionType: CompanionEvolutionType;
+  routeName: string;
+  requirementsSummary: string[];
+}
+
+/** 学習行動で決まる5分岐を、成長期・最終進化へ実際につなぐ判定。 */
+export function checkGrowthEvolutionRequirements(playerInput: PlayerData): GrowthEvolutionStatus {
+  const player = ensureCompanionData(playerInput);
+  const comp = player.companion!;
+  const evolutionType = calculateEvolutionType(comp);
+  const routeName = COMPANION_BRANCH_NAMES[evolutionType];
+  const traitValues = Object.values(comp.progressTraits || {}) as number[];
+  const dominantTrait = Math.max(0, ...traitValues);
+  const reviewCount = (player.reviewedConcepts || []).length;
+  const clearedUnits = Object.values(player.unitProgress || {}).filter(
+    (unit) => unit.cleared || unit.mastered || unit.isUnitCompleted
+  ).length;
+
+  if (comp.stage === 'child') {
+    const energyOk = comp.growthExp >= 300;
+    const traitOk = dominantTrait >= 10;
+    const reviewOk = reviewCount >= 3;
+    return {
+      canEvolve: energyOk && traitOk && reviewOk,
+      nextStage: 'grown', evolutionType, routeName,
+      requirementsSummary: [
+        `知識エネルギー 300以上 (${comp.growthExp}/300)`,
+        `最も高い成長資質 10以上 (${dominantTrait}/10)`,
+        `基礎復習 3回完了 (${reviewCount}/3)`,
+      ],
+    };
+  }
+
+  if (comp.stage === 'grown') {
+    const energyOk = comp.growthExp >= 600;
+    const traitOk = dominantTrait >= 25;
+    const bondOk = comp.bond >= 50;
+    const unitOk = clearedUnits >= 4;
+    return {
+      canEvolve: energyOk && traitOk && bondOk && unitOk,
+      nextStage: 'evolved', evolutionType, routeName,
+      requirementsSummary: [
+        `知識エネルギー 600以上 (${comp.growthExp}/600)`,
+        `最も高い成長資質 25以上 (${dominantTrait}/25)`,
+        `きずな度 50以上 (${comp.bond}/50)`,
+        `単元 4つクリア (${clearedUnits}/4)`,
+      ],
+    };
+  }
+
+  return {
+    canEvolve: false, evolutionType, routeName,
+    requirementsSummary: comp.stage === 'evolved'
+      ? [`最終進化「${routeName}」達成！`]
+      : ['まず幼体まで成長させましょう。'],
+  };
+}
+
+/** 条件達成時に、現在最も高い学習資質のルートへ分岐進化する。 */
+export function executeGrowthEvolution(playerInput: PlayerData): PlayerData {
+  const player = ensureCompanionData(playerInput);
+  const comp = player.companion!;
+  const status = checkGrowthEvolutionRequirements(player);
+  if (!status.canEvolve || !status.nextStage) return player;
+
+  const appearance = { ...comp.appearance };
+  const routeAppearance: Record<CompanionEvolutionType, Partial<typeof appearance>> = {
+    hirameki: { patternType: 'stars', effectType: 'cosmic_sparkles', hornType: 'crystal_horns' },
+    doryoku: { patternType: 'runes', effectType: 'golden_aura', hornType: 'knight_horns' },
+    bouken: { patternType: 'wind_lines', effectType: 'sky_wind', wingType: 'large_wings' },
+    kizuna: { patternType: 'heart_marks', effectType: 'gentle_sparkles', wingType: 'feather_wings' },
+    yuuki: { patternType: 'flame_crest', effectType: 'heroic_flames', hornType: 'brave_horns' },
+  };
+  Object.assign(appearance, routeAppearance[status.evolutionType]);
+
+  const isFinal = status.nextStage === 'evolved';
+  const log: CompanionGrowthLogEntry = {
+    id: `log_branch_evolution_${Date.now()}`,
+    type: isFinal ? 'final_evolved' : 'grown_adult',
+    title: isFinal ? `最終進化！ ${status.routeName}` : `成長期へ進化！ ${status.routeName}`,
+    description: `これまでの学び方から「${status.routeName}」が選ばれ、相棒が新しい姿へ進化しました！`,
+    date: new Date().toISOString().split('T')[0],
+    icon: isFinal ? '🌠' : '🌱',
+    cardBadge: isFinal ? '最終進化記念' : '分岐進化記念',
+  };
+
+  return {
+    ...player,
+    companion: {
+      ...comp,
+      stage: status.nextStage,
+      evolutionType: status.evolutionType,
+      appearance,
+      growthLogs: [log, ...(comp.growthLogs || [])],
+    },
+  };
+}
 
 /**
  * Updates progress traits (insight, effort, adventure, bond, courage) and checks evolution type
