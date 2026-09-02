@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { PlayerData, PrivacySetting } from '../types';
 import { savePlayerDataWithCloud } from '../services/saveSyncService';
+import { savePlayerData } from '../services/gameStorage';
 import { getInitialCompanionSettings } from '../services/companionService';
 import { CloudSaveStatus } from './CloudSaveStatus';
+
+const OFFLINE_MODE = import.meta.env.VITE_OFFLINE_MODE === 'true';
+const persistSettingsPlayer = (player: PlayerData) => OFFLINE_MODE ? savePlayerData(player) : savePlayerDataWithCloud(player);
 import { Settings, Volume2, RotateCcw, ShieldAlert, Check, Sparkles, BookOpen } from 'lucide-react';
 import { FuriganaText } from './FuriganaText';
 
@@ -39,7 +43,9 @@ export const SettingsScreenView: React.FC<SettingsScreenViewProps> = ({
         </div>
 
         {/* Cloud Save Sync Status Panel */}
-        <CloudSaveStatus player={player} onPlayerUpdated={onPlayerUpdate} />
+        {OFFLINE_MODE ? (
+          <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/30 p-3 text-xs text-emerald-200">💾 オフライン版：この端末だけに自動保存されます。</div>
+        ) : <CloudSaveStatus player={player} onPlayerUpdated={onPlayerUpdate} />}
 
         {/* Furigana Display Settings */}
         <div className="bg-slate-950/80 p-4 rounded-xl border border-sky-500/40 space-y-3">
@@ -54,7 +60,7 @@ export const SettingsScreenView: React.FC<SettingsScreenViewProps> = ({
             <button
               onClick={() => {
                 const updatedPlayer: PlayerData = { ...player, furiganaMode: 'all' };
-                savePlayerDataWithCloud(updatedPlayer);
+                persistSettingsPlayer(updatedPlayer);
                 if (onPlayerUpdate) onPlayerUpdate(updatedPlayer);
               }}
               className={`p-3 rounded-xl border font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
@@ -70,7 +76,7 @@ export const SettingsScreenView: React.FC<SettingsScreenViewProps> = ({
             <button
               onClick={() => {
                 const updatedPlayer: PlayerData = { ...player, furiganaMode: 'difficult' };
-                savePlayerDataWithCloud(updatedPlayer);
+                persistSettingsPlayer(updatedPlayer);
                 if (onPlayerUpdate) onPlayerUpdate(updatedPlayer);
               }}
               className={`p-3 rounded-xl border font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
@@ -86,7 +92,7 @@ export const SettingsScreenView: React.FC<SettingsScreenViewProps> = ({
             <button
               onClick={() => {
                 const updatedPlayer: PlayerData = { ...player, furiganaMode: 'off' };
-                savePlayerDataWithCloud(updatedPlayer);
+                persistSettingsPlayer(updatedPlayer);
                 if (onPlayerUpdate) onPlayerUpdate(updatedPlayer);
               }}
               className={`p-3 rounded-xl border font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
@@ -185,7 +191,7 @@ export const SettingsScreenView: React.FC<SettingsScreenViewProps> = ({
                     partnerAnimationEnabled: !settings.partnerAnimationEnabled,
                   },
                 };
-                savePlayerDataWithCloud(updatedPlayer);
+                persistSettingsPlayer(updatedPlayer);
                 if (onPlayerUpdate) onPlayerUpdate(updatedPlayer);
               }}
               className={`p-3 rounded-xl border flex items-center justify-between transition-all ${
@@ -208,7 +214,7 @@ export const SettingsScreenView: React.FC<SettingsScreenViewProps> = ({
                     partnerDialogueEnabled: !settings.partnerDialogueEnabled,
                   },
                 };
-                savePlayerDataWithCloud(updatedPlayer);
+                persistSettingsPlayer(updatedPlayer);
                 if (onPlayerUpdate) onPlayerUpdate(updatedPlayer);
               }}
               className={`p-3 rounded-xl border flex items-center justify-between transition-all ${
@@ -231,7 +237,7 @@ export const SettingsScreenView: React.FC<SettingsScreenViewProps> = ({
                     shortenGrowthAnimation: !settings.shortenGrowthAnimation,
                   },
                 };
-                savePlayerDataWithCloud(updatedPlayer);
+                persistSettingsPlayer(updatedPlayer);
                 if (onPlayerUpdate) onPlayerUpdate(updatedPlayer);
               }}
               className={`p-3 rounded-xl border flex items-center justify-between transition-all ${
@@ -267,7 +273,7 @@ export const SettingsScreenView: React.FC<SettingsScreenViewProps> = ({
                     battleAnimationEnabled: !currentBattle.battleAnimationEnabled,
                   },
                 };
-                savePlayerDataWithCloud(updatedPlayer);
+                persistSettingsPlayer(updatedPlayer);
                 if (onPlayerUpdate) onPlayerUpdate(updatedPlayer);
               }}
               className={`p-3 rounded-xl border flex items-center justify-between transition-all cursor-pointer ${
@@ -294,7 +300,7 @@ export const SettingsScreenView: React.FC<SettingsScreenViewProps> = ({
                     showSkillNames: !currentBattle.showSkillNames,
                   },
                 };
-                savePlayerDataWithCloud(updatedPlayer);
+                persistSettingsPlayer(updatedPlayer);
                 if (onPlayerUpdate) onPlayerUpdate(updatedPlayer);
               }}
               className={`p-3 rounded-xl border flex items-center justify-between transition-all cursor-pointer ${
@@ -321,7 +327,7 @@ export const SettingsScreenView: React.FC<SettingsScreenViewProps> = ({
                     shortenBossAnimation: !currentBattle.shortenBossAnimation,
                   },
                 };
-                savePlayerDataWithCloud(updatedPlayer);
+                persistSettingsPlayer(updatedPlayer);
                 if (onPlayerUpdate) onPlayerUpdate(updatedPlayer);
               }}
               className={`p-3 rounded-xl border flex items-center justify-between transition-all cursor-pointer ${
