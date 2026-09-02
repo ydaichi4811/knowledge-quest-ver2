@@ -12,6 +12,9 @@ import { claimClassroomSeat } from './services/classroomService';
 import { syncCloudAndLocalData } from './services/cloudSaveService';
 import { savePlayerDataWithCloud } from './services/saveSyncService';
 import { CloudSaveStatus } from './components/CloudSaveStatus';
+
+const OFFLINE_MODE = import.meta.env.VITE_OFFLINE_MODE === 'true';
+const persistPlayer = (player: PlayerData) => OFFLINE_MODE ? savePlayerData(player) : persistPlayer(player);
 import { MathriaBackground } from './components/MathriaBackground';
 import { GameFooterMenu, MainTabType, NavTabType } from './components/GameFooterMenu';
 import { HomeScreen } from './components/HomeScreen';
@@ -65,6 +68,8 @@ export default function App() {
       if (initialLocal) {
         setPlayer(initialLocal);
       }
+
+      if (OFFLINE_MODE) return;
 
       try {
         // Anonymous authentication & cloud restore / migration check
@@ -122,10 +127,12 @@ export default function App() {
     classroomId: ClassroomId,
     studentNumber: number
   ): Promise<{ success: boolean; error?: string }> => {
-    const uid = await ensureAnonymousUser();
-    const seatResult = await claimClassroomSeat(uid, classroomId, studentNumber);
-    if (!seatResult.success) {
-      return { success: false, error: seatResult.error };
+    if (!OFFLINE_MODE) {
+      const uid = await ensureAnonymousUser();
+      const seatResult = await claimClassroomSeat(uid, classroomId, studentNumber);
+      if (!seatResult.success) {
+        return { success: false, error: seatResult.error };
+      }
     }
 
     const newPlayer = createInitialPlayer(
@@ -137,7 +144,7 @@ export default function App() {
       classroomId,
       studentNumber
     );
-    savePlayerDataWithCloud(newPlayer);
+    persistPlayer(newPlayer);
     setPlayer(newPlayer);
     setCurrentScreen('home');
     setActiveTab('study');
@@ -147,14 +154,14 @@ export default function App() {
   const handleToggleMode = (newMode: GameMode) => {
     if (!player) return;
     const updated: PlayerData = { ...player, mode: newMode };
-    savePlayerDataWithCloud(updated);
+    persistPlayer(updated);
     setPlayer(updated);
   };
 
   const handleUpdatePrivacySetting = (setting: PrivacySetting) => {
     if (!player) return;
     const updated: PlayerData = { ...player, privacySetting: setting };
-    savePlayerDataWithCloud(updated);
+    persistPlayer(updated);
     setPlayer(updated);
   };
 
@@ -213,7 +220,7 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-3">
-            <CloudSaveStatus player={player} onPlayerUpdated={(updated) => setPlayer(updated)} compact />
+            {OFFLINE_MODE ? <span className="text-xs font-bold text-emerald-300">💾 この端末に保存中</span> : <CloudSaveStatus player={player} onPlayerUpdated={(updated) => setPlayer(updated)} compact />}
             <div className="bg-slate-900 border border-amber-500/40 px-3 py-1 rounded-full flex items-center gap-1.5 text-xs font-bold text-amber-300">
               <span>💎 {player.points} pt</span>
             </div>
@@ -367,7 +374,7 @@ export default function App() {
           }}
           onPlayerUpdate={(updated) => {
             console.log(`⑦/⑧ [App.tsx -> onPlayerUpdate] Received updated player. player.name=${updated.name}, EXP=${updated.exp}, KQ=${updated.points}`);
-            savePlayerDataWithCloud(updated);
+            persistPlayer(updated);
             setPlayer(updated);
           }}
         />
