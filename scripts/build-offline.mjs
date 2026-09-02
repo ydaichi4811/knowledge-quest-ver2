@@ -13,7 +13,14 @@ const scriptPath = resolve(dist, scriptMatch[1].replace(/^\.\//, '').replace(/^\
 const scriptCode = await readFile(scriptPath, 'utf8');
 // Preserve module semantics while avoiding file:// module loading restrictions.
 // Decode bytes into a Blob, then dynamically import its object URL.
-const scriptBase64 = Buffer.from(scriptCode, 'utf8').toString('base64');
+const fileSafeScriptCode = scriptCode.replace(
+  /new URL\\((["'])([^"']+)\\1,import\\.meta\\.url\\)\\.href/g,
+  (_match, _quote, assetName) => `new URL('./assets/${assetName}',document.baseURI).href`,
+);
+if (fileSafeScriptCode.includes('import.meta.url')) {
+  throw new Error('Offline bundle still contains unresolved import.meta.url references');
+}
+const scriptBase64 = Buffer.from(fileSafeScriptCode, 'utf8').toString('base64');
 const bootstrap = `(()=>{const b=atob('${scriptBase64}');const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);const url=URL.createObjectURL(new Blob([u],{type:'text/javascript'}));import(url).catch(e=>{console.error(e);document.body.innerHTML='<main style="color:white;padding:24px;font-family:sans-serif"><h1>起動エラー</h1><p>オフライン版を起動できませんでした。</p><pre style="white-space:pre-wrap">'+String(e)+'</pre></main>'})})()`;
 html = html.replace(scriptMatch[0], `<script>${bootstrap}</script>`);
 
