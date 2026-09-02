@@ -11,11 +11,9 @@ const scriptMatch = html.match(/<script[^>]*type="module"[^>]*src="([^"]+)"[^>]*
 if (!scriptMatch) throw new Error('Vite module script was not found in dist/index.html');
 const scriptPath = resolve(dist, scriptMatch[1].replace(/^\.\//, '').replace(/^\//, ''));
 const scriptCode = await readFile(scriptPath, 'utf8');
-// A literal closing script tag inside the bundle would terminate the inline element early.
-// Vite emits lowercase HTML tag strings, so replace them before embedding the bundle.
-const escapedClosingTag = '<' + String.fromCharCode(92) + '/script';
-const safeScriptCode = scriptCode.replace(new RegExp('</script', 'gi'), escapedClosingTag);
-html = html.replace(scriptMatch[0], `<script type="module">\n${safeScriptCode}\n</script>`);
+// Encode the bundle as a data URL so bundle text can never terminate the HTML script element.
+const scriptDataUrl = `data:text/javascript;base64,${Buffer.from(scriptCode, 'utf8').toString('base64')}`;
+html = html.replace(scriptMatch[0], `<script type="module" src="${scriptDataUrl}"></script>`);
 
 const styleMatches = [...html.matchAll(/<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g)];
 for (const match of styleMatches) {
