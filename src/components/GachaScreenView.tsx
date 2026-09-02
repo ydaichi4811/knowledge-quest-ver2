@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { PlayerData } from '../types';
 import { savePlayerData, addExpAndPoints } from '../services/gameStorage';
 import { addInventoryItem } from '../services/itemAndRoomService';
+import { addKnowledgeEnergy } from '../services/companionService';
 import { Sparkles, Gift, Zap, Shield, Wand2, Crown, Package } from 'lucide-react';
 
 interface GachaScreenViewProps {
@@ -12,7 +13,12 @@ interface GachaScreenViewProps {
   onOpenCompanionRoom?: () => void;
 }
 
-export type OfficialGachaRarity = 'ノーマル' | 'レア' | 'スーパーレア' | 'ウルトラレア' | 'レジェンド';
+export type OfficialGachaRarity = 'ノーマル' | 'レア' | 'スーパーレア' | 'ウルトラレア' | 'レジェンド' | 'シークレット';
+
+export const GACHA_RARITY_RATES = {
+  standard: { 'ノーマル': 39, 'レア': 25, 'スーパーレア': 20, 'ウルトラレア': 10, 'レジェンド': 5, 'シークレット': 1 },
+  premium: { 'ノーマル': 0, 'レア': 35, 'スーパーレア': 35, 'ウルトラレア': 18, 'レジェンド': 10, 'シークレット': 2 },
+} as const satisfies Record<'standard' | 'premium', Record<OfficialGachaRarity, number>>;
 
 export interface GachaItemDef {
   title: string;
@@ -22,6 +28,7 @@ export interface GachaItemDef {
   type: 'item' | 'equipment';
   exp: number;
   pts: number;
+  companionExp?: number;
   nurturingItemId?: string;
   desc: string;
   chestIcon: string;
@@ -30,6 +37,9 @@ export interface GachaItemDef {
 }
 
 export const OFFICIAL_GACHA_ITEMS: GachaItemDef[] = [
+  // シークレット (★6)
+  { title: '星界のシークレットエッグ', icon: '🌌🥚', rarity: 'シークレット', stars: 6, type: 'item', exp: 250, pts: 300, companionExp: 150, nurturingItemId: 'evolution_dew', desc: '星の世界から届いた幻のたまご。相棒に大量の知識エネルギーを与える奇跡の秘宝！', chestIcon: '🌈', colorClass: 'border-cyan-200 bg-gradient-to-br from-emerald-500/20 via-cyan-500/20 to-indigo-500/20 text-cyan-100', badgeBg: 'bg-gradient-to-r from-emerald-300 via-cyan-300 to-indigo-300 text-slate-950' },
+  { title: '時空の王冠', icon: '👑🌠', rarity: 'シークレット', stars: 6, type: 'equipment', exp: 220, pts: 280, companionExp: 120, desc: '学びを極めた冒険者だけが出会える、時空を越えて輝く秘密の王冠。', chestIcon: '🌈', colorClass: 'border-cyan-200 bg-gradient-to-br from-emerald-500/20 via-cyan-500/20 to-indigo-500/20 text-cyan-100', badgeBg: 'bg-gradient-to-r from-emerald-300 via-cyan-300 to-indigo-300 text-slate-950' },
   // レジェンド (★5)
   { title: '覚醒の宝石', icon: '💎✨', rarity: 'レジェンド', stars: 5, type: 'item', exp: 150, pts: 200, nurturingItemId: 'evolution_dew', desc: '相棒の潜在能力を最大覚醒させる超貴重な秘宝！', chestIcon: '🐲', colorClass: 'border-amber-400 bg-amber-500/20 text-amber-200', badgeBg: 'bg-amber-400 text-slate-950' },
   { title: 'ゴールドソード', icon: '⚔️✨', rarity: 'レジェンド', stars: 5, type: 'equipment', exp: 120, pts: 150, desc: '眩く輝く黄金の聖剣。攻撃力と全ステータス大上昇！', chestIcon: '🐲', colorClass: 'border-amber-400 bg-amber-500/20 text-amber-200', badgeBg: 'bg-amber-400 text-slate-950' },
@@ -64,17 +74,14 @@ export const GACHA_COSTS = {
 } as const;
 
 export function selectGachaRarity(roll: number, premium: boolean): OfficialGachaRarity {
-  const value = Math.min(0.999999, Math.max(0, roll));
-  if (premium) {
-    if (value < 0.10) return 'レジェンド';
-    if (value < 0.35) return 'ウルトラレア';
-    if (value < 0.75) return 'スーパーレア';
-    return 'レア';
+  const value = Math.min(0.999999, Math.max(0, roll)) * 100;
+  const rates = GACHA_RARITY_RATES[premium ? 'premium' : 'standard'];
+  const ordered: OfficialGachaRarity[] = ['シークレット', 'レジェンド', 'ウルトラレア', 'スーパーレア', 'レア', 'ノーマル'];
+  let cumulative = 0;
+  for (const rarity of ordered) {
+    cumulative += rates[rarity];
+    if (value < cumulative) return rarity;
   }
-  if (value < 0.02) return 'レジェンド';
-  if (value < 0.10) return 'ウルトラレア';
-  if (value < 0.30) return 'スーパーレア';
-  if (value < 0.65) return 'レア';
   return 'ノーマル';
 }
 
@@ -125,12 +132,18 @@ export const GachaScreenView: React.FC<GachaScreenViewProps> = ({
       const playerWithUsableReward = inventoryResult?.success
         ? inventoryResult.updatedPlayer
         : playerAfterCostAndExp;
+      const companionReward = selected.companionExp ?? selected.stars * 10;
+      const { updatedPlayer: playerWithCompanionGrowth } = addKnowledgeEnergy(
+        playerWithUsableReward,
+        companionReward,
+        `ガチャ：${selected.title}`
+      );
 
       const updatedPlayer: PlayerData = {
-        ...playerWithUsableReward,
+        ...playerWithCompanionGrowth,
         gachaCollection: {
-          ...(playerWithUsableReward.gachaCollection || {}),
-          [selected.title]: (playerWithUsableReward.gachaCollection?.[selected.title] || 0) + 1,
+          ...(playerWithCompanionGrowth.gachaCollection || {}),
+          [selected.title]: (playerWithCompanionGrowth.gachaCollection?.[selected.title] || 0) + 1,
         },
         updatedAt: new Date().toISOString(),
       };
@@ -166,27 +179,21 @@ export const GachaScreenView: React.FC<GachaScreenViewProps> = ({
         {/* Rarities Showcase Bar */}
         <div className="bg-slate-950/90 p-3 rounded-xl border border-amber-500/30">
           <div className="text-[11px] font-bold text-amber-300 mb-2">✨ 登場レアリティ一覧</div>
-          <div className="grid grid-cols-5 gap-1 text-[10px] font-bold">
-            <div className="p-1.5 rounded-lg border border-slate-600 bg-slate-800/80 text-slate-300">
-              <div>📦 ノーマル</div>
-              <div className="text-amber-400">★</div>
-            </div>
-            <div className="p-1.5 rounded-lg border border-cyan-500/60 bg-cyan-950/60 text-cyan-200">
-              <div>🟦 レア</div>
-              <div className="text-amber-400">★★</div>
-            </div>
-            <div className="p-1.5 rounded-lg border border-purple-500/60 bg-purple-950/60 text-purple-200">
-              <div>🟪 Sレア</div>
-              <div className="text-amber-400">★★★</div>
-            </div>
-            <div className="p-1.5 rounded-lg border border-rose-500/60 bg-rose-950/60 text-rose-200">
-              <div>🟥 Uレア</div>
-              <div className="text-amber-400">★★★★</div>
-            </div>
-            <div className="p-1.5 rounded-lg border border-amber-400 bg-amber-500/20 text-amber-200 animate-pulse">
-              <div>🐲 レジェンド</div>
-              <div className="text-amber-400">★★★★★</div>
-            </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1 text-[10px] font-bold">
+            {([
+              ['📦', 'ノーマル', '★', '39% / 特別0%'],
+              ['🟦', 'レア', '★★', '25% / 特別35%'],
+              ['🟪', 'Sレア', '★★★', '20% / 特別35%'],
+              ['🟥', 'Uレア', '★★★★', '10% / 特別18%'],
+              ['🐲', 'レジェンド', '★★★★★', '5% / 特別10%'],
+              ['🌈', 'シークレット', '★★★★★★', '1% / 特別2%'],
+            ] as const).map(([icon, name, stars, rates]) => (
+              <div key={name} className="p-1.5 rounded-lg border border-amber-500/30 bg-slate-900/80 text-amber-100">
+                <div>{icon} {name}</div>
+                <div className="text-amber-400">{stars}</div>
+                <div className="text-[9px] text-slate-300">通常 / 特別 {rates}</div>
+              </div>
+            ))}
           </div>
         </div>
 
