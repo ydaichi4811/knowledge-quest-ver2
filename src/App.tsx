@@ -14,7 +14,7 @@ import { savePlayerDataWithCloud } from './services/saveSyncService';
 import { CloudSaveStatus } from './components/CloudSaveStatus';
 
 const OFFLINE_MODE = import.meta.env.VITE_OFFLINE_MODE === 'true';
-const persistPlayer = (player: PlayerData) => OFFLINE_MODE ? savePlayerData(player) : persistPlayer(player);
+const persistPlayer = (player: PlayerData) => OFFLINE_MODE ? savePlayerData(player) : savePlayerDataWithCloud(player);
 import { MathriaBackground } from './components/MathriaBackground';
 import { GameFooterMenu, MainTabType, NavTabType } from './components/GameFooterMenu';
 import { HomeScreen } from './components/HomeScreen';
