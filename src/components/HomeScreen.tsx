@@ -252,10 +252,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     </div>
 
                     {/* Fantasy Stage Illustration + Hero & Pet */}
-                    <div className="w-full flex-1 my-1 rounded-xl bg-gradient-to-b from-[#7ec5f8] via-[#a3d8ff] to-[#7fb75f] border border-[#c4b391] relative overflow-hidden flex items-end justify-center pb-0 shadow-inner min-h-[220px]">
+                    <div className="w-full flex-1 my-1 rounded-xl bg-gradient-to-b from-[#fffaf0] via-[#f8efd9] to-[#e8d7b4] border border-[#c4b391] relative overflow-hidden flex items-end justify-center pb-0 shadow-inner min-h-[220px]">
                       
                       {/* Background Castle & Clouds */}
-                      <div className="absolute top-2 left-2 right-2 flex justify-between text-white/80 opacity-70">
+                      <div className="absolute top-2 left-2 right-2 flex justify-between text-sky-300 opacity-45">
                         <span className="text-2xl">☁️</span>
                         <span className="text-xl">🏰</span>
                         <span className="text-2xl">☁️</span>
@@ -263,8 +263,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
                       {/* Characters centered with flex gap */}
                       <div
-                        className="flex items-end justify-center relative z-10 pb-0 mb-0"
-                        style={{ gap: 'clamp(12px, 4vw, 28px)' }}
+                        className="flex items-end justify-center relative z-10 pb-0 mb-0 w-full px-5"
+                        style={{ gap: 'clamp(4px, 2vw, 14px)' }}
                       >
                         {/* Hero Character (15% larger & aligned to stage bottom edge, slightly right) */}
                         <div
@@ -272,7 +272,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                           onClick={() => setShowHeroStatusModal(true)}
                           title="主人公ステータスを見る"
                         >
-                          <HeroCharacter player={player} size="md" className="scale-[1.15] origin-bottom block" viewType="sd" />
+                          <HeroCharacter player={player} size="md" className="scale-[1.04] origin-bottom block mix-blend-multiply" viewType="sd" />
                         </div>
 
                         {/* Buddy Character (slightly left) */}
@@ -281,7 +281,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                           onClick={onOpenPartnerCare}
                           title="バディとふれあう"
                         >
-                          <BuddyCharacter player={player} size="md" className="origin-bottom block" />
+                          <BuddyCharacter player={player} size="md" className="scale-[1.12] origin-bottom block mix-blend-multiply" />
                         </div>
                       </div>
                     </div>
