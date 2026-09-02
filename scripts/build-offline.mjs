@@ -11,10 +11,10 @@ const scriptMatch = html.match(/<script[^>]*type="module"[^>]*src="([^"]+)"[^>]*
 if (!scriptMatch) throw new Error('Vite module script was not found in dist/index.html');
 const scriptPath = resolve(dist, scriptMatch[1].replace(/^\.\//, '').replace(/^\//, ''));
 const scriptCode = await readFile(scriptPath, 'utf8');
-// Keep the HTML parser away from bundle text and execute it as a classic script.
-// file:// pages can block module data URLs, while this bootstrap works fully offline.
+// Preserve module semantics while avoiding file:// module loading restrictions.
+// Decode bytes into a Blob, then dynamically import its object URL.
 const scriptBase64 = Buffer.from(scriptCode, 'utf8').toString('base64');
-const bootstrap = `(()=>{const s=document.createElement('script');s.textContent=atob('${scriptBase64}');document.head.appendChild(s)})()`;
+const bootstrap = `(()=>{const b=atob('${scriptBase64}');const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);const url=URL.createObjectURL(new Blob([u],{type:'text/javascript'}));import(url).catch(e=>{console.error(e);document.body.innerHTML='<main style="color:white;padding:24px;font-family:sans-serif"><h1>起動エラー</h1><p>オフライン版を起動できませんでした。</p><pre style="white-space:pre-wrap">'+String(e)+'</pre></main>'})})()`;
 html = html.replace(scriptMatch[0], `<script>${bootstrap}</script>`);
 
 const styleMatches = [...html.matchAll(/<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g)];
