@@ -14,8 +14,8 @@ const scriptCode = await readFile(scriptPath, 'utf8');
 // Preserve module semantics while avoiding file:// module loading restrictions.
 // Decode bytes into a Blob, then dynamically import its object URL.
 const fileSafeScriptCode = scriptCode.replace(
-  /new URL\\((["'])([^"']+)\\1,import\\.meta\\.url\\)\\.href/g,
-  (_match, _quote, assetName) => `new URL('./assets/${assetName}',document.baseURI).href`,
+  /new URL\("([^"]+)",import\.meta\.url\)\.href/g,
+  (_match, assetName) => `new URL('./assets/${assetName}',document.baseURI).href`,
 );
 if (fileSafeScriptCode.includes('import.meta.url')) {
   throw new Error('Offline bundle still contains unresolved import.meta.url references');
