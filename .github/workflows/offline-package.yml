@@ -1,0 +1,39 @@
+name: Build Offline Package
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Type check
+        run: npm run lint
+      - name: Run tests
+        run: npm test
+      - name: Build offline app
+        run: npm run build
+        env:
+          VITE_OFFLINE_MODE: 'true'
+          VITE_PUBLIC_BASE: './'
+      - name: Inline app entry files
+        run: node scripts/build-offline.mjs
+      - name: Upload offline ZIP source
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-quest-offline
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14

@@ -80,7 +80,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   onStartQuest,
   onOpenPretest,
 }) => {
-  const [selectedRegionId, setSelectedRegionId] = useState<string>('area');
+  const [selectedRegionId, setSelectedRegionId] = useState<string>('averia');
   const [activeStageModal, setActiveStageModal] = useState<QuestStage | null>(null);
   const [lockedNotice, setLockedNotice] = useState<string | null>(null);
 
@@ -364,7 +364,19 @@ export const MapScreen: React.FC<MapScreenProps> = ({
                             ) : isMidBoss ? (
                               '💎'
                             ) : (
-                              stage.topic.includes('平行')
+                              stage.topic.includes('平均')
+                                ? '⚖️'
+                                : stage.topic.includes('0を含む')
+                                ? '0️⃣'
+                                : stage.topic.includes('合計')
+                                ? '💠'
+                                : stage.topic.includes('見積もり')
+                                ? '🔭'
+                                : stage.topic.includes('複数グループ')
+                                ? '🌉'
+                                : stage.topic.includes('利用・総合')
+                                ? '🏆'
+                                : stage.topic.includes('平行')
                                 ? '🌲'
                                 : stage.topic.includes('三角')
                                 ? '⛰️'

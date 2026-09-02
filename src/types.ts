@@ -205,7 +205,7 @@ export interface ProgressTraits {
 
 export interface CompanionGrowthLogEntry {
   id: string;
-  type: 'obtained_egg' | 'hatched' | 'named' | 'grown_child' | 'rarity_upgraded' | 'first_unit_cleared' | 'foundation_review_mastered';
+  type: 'obtained_egg' | 'hatched' | 'named' | 'grown_child' | 'grown_adult' | 'final_evolved' | 'rarity_upgraded' | 'first_unit_cleared' | 'foundation_review_mastered';
   title: string;
   description: string;
   date: string;
